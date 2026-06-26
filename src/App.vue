@@ -9,6 +9,7 @@ const navItems = [
   { label: 'About', href: '#about' },
 ]
 
+const baseUrl = import.meta.env.BASE_URL
 const bookCallHref = '#book-call'
 
 const services = [
@@ -174,7 +175,7 @@ onUnmounted(() => {
           @click="closeMobileMenu"
         >
           <img
-            src="/logo.png"
+            :src="`${baseUrl}logo.png`"
             alt="Hyacinth Advertising"
             class="h-8 w-40 object-cover object-center sm:h-10 sm:w-56"
           />
@@ -269,7 +270,7 @@ onUnmounted(() => {
 
         <div class="mx-auto mt-7 max-w-3xl overflow-hidden border border-neutral-200 bg-neutral-100 sm:mt-9">
           <img
-            src="/home.png"
+            :src="`${baseUrl}home.png`"
             alt="Production crew filming creator-led advertising content"
             class="aspect-[1400/700] w-full object-cover"
           />
