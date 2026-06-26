@@ -257,7 +257,7 @@ onUnmounted(() => {
     <main v-if="currentPage === 'home'">
       <section
         id="home"
-        class="mx-auto max-w-7xl px-5 pb-16 pt-5 sm:px-8 sm:pb-24 sm:pt-7 lg:px-10"
+        class="mx-auto max-w-7xl scroll-mt-24 px-5 pb-16 pt-5 sm:px-8 sm:pb-24 sm:pt-7 lg:px-10"
       >
         <div class="mx-auto max-w-6xl text-center">
           <h1
@@ -287,7 +287,7 @@ onUnmounted(() => {
 
       <section
         id="services"
-        class="border-y border-neutral-200 bg-white px-5 py-16 sm:px-8 sm:py-24 lg:px-10"
+        class="border-b border-neutral-200 bg-white px-5 py-16 sm:px-8 sm:py-24 lg:px-10"
       >
         <div class="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[0.78fr_1.22fr]">
           <div>
@@ -662,7 +662,7 @@ onUnmounted(() => {
     <footer
       v-if="currentPage === 'home'"
       id="book-call"
-      class="scroll-mt-32 border-t border-neutral-200 px-5 py-16 sm:px-8 sm:py-24 lg:px-10"
+      class="scroll-mt-32 border-t border-neutral-200 px-5 pb-10 pt-16 sm:px-8 sm:pb-8 sm:pt-24 lg:px-10"
     >
       <div class="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[0.78fr_1.22fr]">
         <div>
@@ -745,7 +745,7 @@ onUnmounted(() => {
       <div
         class="mx-auto mt-14 flex max-w-7xl flex-col gap-4 border-t border-neutral-200 pt-8 text-sm font-semibold uppercase tracking-[0.25em] text-neutral-500 sm:flex-row sm:items-center sm:justify-between"
       >
-        <span>Hyacinth Advertising</span>
+        <span>Hyacinth Advertising, LLC</span>
         <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-8">
           <a href="#/terms" class="transition hover:text-neutral-950">Terms</a>
           <a href="#/privacy" class="transition hover:text-neutral-950">Privacy</a>
@@ -761,7 +761,7 @@ onUnmounted(() => {
       <div
         class="mx-auto flex max-w-7xl flex-col gap-4 text-sm font-semibold uppercase tracking-[0.25em] text-neutral-500 sm:flex-row sm:items-center sm:justify-between"
       >
-        <a href="#home" class="transition hover:text-neutral-950">Hyacinth Advertising</a>
+        <a href="#home" class="transition hover:text-neutral-950">Hyacinth Advertising, LLC</a>
         <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-8">
           <a href="#/terms" class="transition hover:text-neutral-950">Terms</a>
           <a href="#/privacy" class="transition hover:text-neutral-950">Privacy</a>
