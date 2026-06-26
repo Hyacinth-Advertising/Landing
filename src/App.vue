@@ -1,12 +1,12 @@
 <script setup>
-import { nextTick, onMounted, ref } from 'vue'
+import { nextTick, onMounted, onUnmounted, ref } from 'vue'
 
 const navItems = [
   { label: 'Home', href: '#home' },
   { label: 'Services', href: '#services' },
   { label: 'UCG', href: '#ugc' },
-  { label: 'About', href: '#about' },
   { label: 'FAQ', href: '#faq' },
+  { label: 'About', href: '#about' },
 ]
 
 const bookCallHref = '#book-call'
@@ -85,10 +85,11 @@ const faqs = [
   },
 ]
 
-const openServices = ref([0])
-const openFaqs = ref([0])
+const openServices = ref([])
+const openFaqs = ref([])
 const formSubmitted = ref(false)
 const mobileMenuOpen = ref(false)
+const currentPage = ref('home')
 
 function toggleIndex(collection, index) {
   return collection.includes(index)
@@ -116,12 +117,45 @@ function closeMobileMenu() {
   mobileMenuOpen.value = false
 }
 
-onMounted(async () => {
+function scrollToHash(hash) {
+  if (!hash || hash.startsWith('#/')) {
+    window.scrollTo({ top: 0 })
+    return
+  }
+
+  window.setTimeout(() => {
+    document.querySelector(hash)?.scrollIntoView()
+  }, 0)
+}
+
+async function syncRoute() {
+  const hash = window.location.hash
+
+  if (hash === '#/terms') {
+    currentPage.value = 'terms'
+  } else if (hash === '#/privacy') {
+    currentPage.value = 'privacy'
+  } else {
+    currentPage.value = 'home'
+  }
+
+  closeMobileMenu()
   await nextTick()
 
-  if (window.location.hash === bookCallHref) {
-    document.querySelector(bookCallHref)?.scrollIntoView()
+  if (currentPage.value === 'home') {
+    scrollToHash(hash)
+  } else {
+    window.scrollTo({ top: 0 })
   }
+}
+
+onMounted(() => {
+  syncRoute()
+  window.addEventListener('hashchange', syncRoute)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('hashchange', syncRoute)
 })
 </script>
 
@@ -220,7 +254,7 @@ onMounted(async () => {
       </nav>
     </header>
 
-    <main>
+    <main v-if="currentPage === 'home'">
       <section
         id="home"
         class="mx-auto max-w-7xl px-5 pb-16 pt-5 sm:px-8 sm:pb-24 sm:pt-7 lg:px-10"
@@ -282,7 +316,15 @@ onMounted(async () => {
                   class="grid h-9 w-9 shrink-0 place-items-center border border-neutral-950 text-2xl leading-none"
                   aria-hidden="true"
                 >
-                  <span class="-translate-y-px">{{ openServices.includes(index) ? '-' : '+' }}</span>
+                  <span class="relative h-4 w-4 -translate-y-px">
+                    <span
+                      class="absolute left-0 top-1/2 h-0.5 w-4 -translate-y-1/2 bg-current"
+                    ></span>
+                    <span
+                      class="absolute left-1/2 top-0 h-4 w-0.5 -translate-x-1/2 bg-current transition duration-200"
+                      :class="openServices.includes(index) ? 'rotate-90 opacity-0' : 'rotate-0 opacity-100'"
+                    ></span>
+                  </span>
                 </span>
               </button>
 
@@ -350,7 +392,15 @@ onMounted(async () => {
                   class="grid h-9 w-9 shrink-0 place-items-center border border-neutral-950 text-2xl leading-none"
                   aria-hidden="true"
                 >
-                  <span class="-translate-y-px">{{ openFaqs.includes(index) ? '-' : '+' }}</span>
+                  <span class="relative h-4 w-4 -translate-y-px">
+                    <span
+                      class="absolute left-0 top-1/2 h-0.5 w-4 -translate-y-1/2 bg-current"
+                    ></span>
+                    <span
+                      class="absolute left-1/2 top-0 h-4 w-0.5 -translate-x-1/2 bg-current transition duration-200"
+                      :class="openFaqs.includes(index) ? 'rotate-90 opacity-0' : 'rotate-0 opacity-100'"
+                    ></span>
+                  </span>
                 </span>
               </button>
 
@@ -399,7 +449,218 @@ onMounted(async () => {
       </section>
     </main>
 
+    <main v-else class="px-5 py-16 sm:px-8 sm:py-24 lg:px-10">
+      <section v-if="currentPage === 'terms'" class="mx-auto max-w-4xl">
+        <a
+          href="#home"
+          class="mb-10 inline-flex text-sm font-black uppercase tracking-[0.22em] text-neutral-600 transition hover:text-neutral-950 focus:outline-none focus-visible:ring-2 focus-visible:ring-neutral-950 focus-visible:ring-offset-4"
+        >
+          Back to Home
+        </a>
+
+        <h1 class="text-5xl font-black uppercase leading-none sm:text-7xl">
+          Terms and Conditions
+        </h1>
+        <p class="mt-5 text-sm font-semibold uppercase tracking-[0.22em] text-neutral-500">
+          Last updated: June 26, 2026
+        </p>
+
+        <div class="mt-12 grid gap-9 text-lg leading-8 text-neutral-700">
+          <section>
+            <h2 class="mb-3 text-2xl font-black uppercase leading-none text-neutral-950">
+              Agreement to Terms
+            </h2>
+            <p>
+              By accessing this website or contacting Hyacinth Advertising, you agree to these
+              Terms and Conditions. If you do not agree with these terms, do not use this website.
+            </p>
+          </section>
+
+          <section>
+            <h2 class="mb-3 text-2xl font-black uppercase leading-none text-neutral-950">
+              Services
+            </h2>
+            <p>
+              Hyacinth Advertising provides creative strategy, creator-led content production,
+              direct-response advertising creative, and related marketing services. Specific
+              deliverables, timelines, and pricing are defined in written proposals, statements of
+              work, or other agreements between Hyacinth Advertising and each client.
+            </p>
+          </section>
+
+          <section>
+            <h2 class="mb-3 text-2xl font-black uppercase leading-none text-neutral-950">
+              Client Materials and Approvals
+            </h2>
+            <p>
+              Clients are responsible for providing accurate product information, brand guidelines,
+              usage rights, and other materials needed for production. Clients are also responsible
+              for reviewing and approving final content before publication or paid distribution.
+            </p>
+          </section>
+
+          <section>
+            <h2 class="mb-3 text-2xl font-black uppercase leading-none text-neutral-950">
+              Intellectual Property
+            </h2>
+            <p>
+              Ownership and usage rights for creative work are governed by the applicable client
+              agreement. Unless otherwise agreed in writing, Hyacinth Advertising retains rights to
+              its pre-existing materials, processes, templates, and know-how.
+            </p>
+          </section>
+
+          <section>
+            <h2 class="mb-3 text-2xl font-black uppercase leading-none text-neutral-950">
+              No Guaranteed Results
+            </h2>
+            <p>
+              Hyacinth Advertising creates content intended to improve advertising performance, but
+              does not guarantee specific sales, revenue, engagement, conversion rates, platform
+              approvals, or campaign outcomes.
+            </p>
+          </section>
+
+          <section>
+            <h2 class="mb-3 text-2xl font-black uppercase leading-none text-neutral-950">
+              Third-Party Platforms
+            </h2>
+            <p>
+              Social media, advertising, analytics, payment, scheduling, and creator platforms are
+              operated by third parties. Hyacinth Advertising is not responsible for changes,
+              outages, policy decisions, or actions taken by those platforms.
+            </p>
+          </section>
+
+          <section>
+            <h2 class="mb-3 text-2xl font-black uppercase leading-none text-neutral-950">
+              Limitation of Liability
+            </h2>
+            <p>
+              To the fullest extent permitted by law, Hyacinth Advertising is not liable for
+              indirect, incidental, consequential, special, or punitive damages arising from use of
+              this website or services.
+            </p>
+          </section>
+
+          <section>
+            <h2 class="mb-3 text-2xl font-black uppercase leading-none text-neutral-950">
+              Contact
+            </h2>
+            <p>
+              Questions about these terms can be sent through the Book a Call form on this website.
+            </p>
+          </section>
+        </div>
+      </section>
+
+      <section v-else class="mx-auto max-w-4xl">
+        <a
+          href="#home"
+          class="mb-10 inline-flex text-sm font-black uppercase tracking-[0.22em] text-neutral-600 transition hover:text-neutral-950 focus:outline-none focus-visible:ring-2 focus-visible:ring-neutral-950 focus-visible:ring-offset-4"
+        >
+          Back to Home
+        </a>
+
+        <h1 class="text-5xl font-black uppercase leading-none sm:text-7xl">
+          Privacy Policy
+        </h1>
+        <p class="mt-5 text-sm font-semibold uppercase tracking-[0.22em] text-neutral-500">
+          Last updated: June 26, 2026
+        </p>
+
+        <div class="mt-12 grid gap-9 text-lg leading-8 text-neutral-700">
+          <section>
+            <h2 class="mb-3 text-2xl font-black uppercase leading-none text-neutral-950">
+              Information We Collect
+            </h2>
+            <p>
+              We may collect information you submit through this website, including your first name,
+              last name, business name, email address, and any additional information you choose to
+              provide. We may also collect basic website usage information such as device, browser,
+              pages visited, and referral source.
+            </p>
+          </section>
+
+          <section>
+            <h2 class="mb-3 text-2xl font-black uppercase leading-none text-neutral-950">
+              How We Use Information
+            </h2>
+            <p>
+              We use collected information to respond to inquiries, schedule calls, provide and
+              improve services, understand website performance, and communicate about Hyacinth
+              Advertising.
+            </p>
+          </section>
+
+          <section>
+            <h2 class="mb-3 text-2xl font-black uppercase leading-none text-neutral-950">
+              Sharing Information
+            </h2>
+            <p>
+              We do not sell personal information. We may share information with service providers
+              that help operate the website, schedule calls, manage communications, or deliver
+              services, and when required by law or necessary to protect our rights.
+            </p>
+          </section>
+
+          <section>
+            <h2 class="mb-3 text-2xl font-black uppercase leading-none text-neutral-950">
+              Cookies and Analytics
+            </h2>
+            <p>
+              This website may use cookies or analytics tools to understand traffic and improve the
+              website experience. You can adjust browser settings to block or delete cookies.
+            </p>
+          </section>
+
+          <section>
+            <h2 class="mb-3 text-2xl font-black uppercase leading-none text-neutral-950">
+              Data Retention and Security
+            </h2>
+            <p>
+              We keep information only as long as reasonably needed for business, legal, and
+              operational purposes. We use reasonable safeguards, but no website or electronic
+              transmission is completely secure.
+            </p>
+          </section>
+
+          <section>
+            <h2 class="mb-3 text-2xl font-black uppercase leading-none text-neutral-950">
+              Your Choices
+            </h2>
+            <p>
+              You may request that we update, correct, or delete information you have provided by
+              contacting us through the Book a Call form. Some information may be retained when
+              required for legal or legitimate business purposes.
+            </p>
+          </section>
+
+          <section>
+            <h2 class="mb-3 text-2xl font-black uppercase leading-none text-neutral-950">
+              Children's Privacy
+            </h2>
+            <p>
+              This website is not intended for children under 13, and we do not knowingly collect
+              personal information from children.
+            </p>
+          </section>
+
+          <section>
+            <h2 class="mb-3 text-2xl font-black uppercase leading-none text-neutral-950">
+              Contact
+            </h2>
+            <p>
+              Questions about this Privacy Policy can be sent through the Book a Call form on this
+              website.
+            </p>
+          </section>
+        </div>
+      </section>
+    </main>
+
     <footer
+      v-if="currentPage === 'home'"
       id="book-call"
       class="scroll-mt-32 border-t border-neutral-200 px-5 py-16 sm:px-8 sm:py-24 lg:px-10"
     >
@@ -485,7 +746,26 @@ onMounted(async () => {
         class="mx-auto mt-14 flex max-w-7xl flex-col gap-4 border-t border-neutral-200 pt-8 text-sm font-semibold uppercase tracking-[0.25em] text-neutral-500 sm:flex-row sm:items-center sm:justify-between"
       >
         <span>Hyacinth Advertising</span>
-        <span>Ads that convert</span>
+        <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-8">
+          <a href="#/terms" class="transition hover:text-neutral-950">Terms</a>
+          <a href="#/privacy" class="transition hover:text-neutral-950">Privacy</a>
+          <span>Ads that convert</span>
+        </div>
+      </div>
+    </footer>
+
+    <footer
+      v-else
+      class="border-t border-neutral-200 px-5 py-8 sm:px-8 lg:px-10"
+    >
+      <div
+        class="mx-auto flex max-w-7xl flex-col gap-4 text-sm font-semibold uppercase tracking-[0.25em] text-neutral-500 sm:flex-row sm:items-center sm:justify-between"
+      >
+        <a href="#home" class="transition hover:text-neutral-950">Hyacinth Advertising</a>
+        <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-8">
+          <a href="#/terms" class="transition hover:text-neutral-950">Terms</a>
+          <a href="#/privacy" class="transition hover:text-neutral-950">Privacy</a>
+        </div>
       </div>
     </footer>
   </div>
