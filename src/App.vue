@@ -1,772 +1,288 @@
 <script setup>
-import { nextTick, onMounted, onUnmounted, ref } from 'vue'
+import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue'
+
+const baseUrl = import.meta.env.BASE_URL
+const currentPage = ref('home')
+const mobileMenuOpen = ref(false)
+const activeStage = ref(0)
+const slideDirection = ref('forward')
+const formSubmitted = ref(false)
+const flowerPositions = [15, 50, 82]
 
 const navItems = [
   { label: 'Home', href: '#home' },
-  { label: 'Services', href: '#services' },
-  { label: 'UCG', href: '#ugc' },
-  { label: 'FAQ', href: '#faq' },
-  { label: 'About', href: '#about' },
+  { label: 'About Us', href: '#/about' },
+  { label: 'FAQs', href: '#/faq' },
 ]
 
-const baseUrl = import.meta.env.BASE_URL
-const bookCallHref = '#book-call'
-
-const services = [
+const processStages = [
   {
-    title: 'Creative Strategy',
-    body: [
-      'We identify what your audience actually responds to, not just what looks good.',
-      'Every project starts with research into your competitors, your positioning, and the creative angles most likely to convert.',
+    number: '01',
+    title: 'Strategy',
+    summary: 'We identify what your audience actually responds to, not just what looks good. Every project starts with research into your brand, your positioning, your content, your competitors and their paid media, and the creative angles most likely to convert.',
+    items: [
+      { title: 'Competitor Analysis', icon: 'CompetitorAnalysisIcon.png', text: 'We analyze top competitors to identify what’s working, what’s missing, and where the opportunities are.' },
+      { title: 'Audience Research', icon: 'AudienceResearchIcon.png', text: 'We dig into your audience’s pain points, desires, and behaviors to inform the creative direction.' },
+      { title: 'Paid Ad Audit', icon: 'PaidAdAuditIcon.png', text: 'We review your existing ads to find what’s underperforming and what can be improved.' },
+      { title: 'Messaging Insights', icon: 'MessagingInsightsIcon.png', text: 'We identify the angles, hooks, and messaging themes most likely to convert.' },
     ],
   },
   {
-    title: 'UGC Production',
-    body: [
-      'We source creators, write scripts, direct production, and deliver authentic creator-led ads built specifically for TikTok, Instagram, Meta, and other paid social platforms.',
+    number: '02',
+    title: 'Production',
+    summary: 'We produce performance creative designed to drive measurable business results, owning every stage of the creative process from strategy and scripting to production.',
+    items: [
+      { title: 'Creative Direction', icon: 'CreativeDirectionIcon.png', text: 'We develop the core concept, visual approach, and message that will resonate with your audience.' },
+      { title: 'Script & Messaging', icon: 'ScriptIcon.png', text: 'We write hooks, scripts, and CTAs that stop the scroll and drive action.' },
+      { title: 'Production', icon: 'ProductionIcon.png', text: 'We handle filming, talent, props, and everything needed to bring the concept to life.' },
+      { title: 'Editing & Finishing', icon: 'EditingIcon.png', text: 'We edit, add captions, sound design, and final polish to create thumb-stopping ads.' },
     ],
   },
   {
-    title: 'Direct-Response Advertising',
-    body: [
-      'Our creative is designed for one purpose: to drive measurable business results. Every hook, script, edit, and call-to-action is created with conversion in mind.',
-    ],
-  },
-  {
-    title: 'Creative Testing',
-    body: [
-      'Winning ads rarely come from a single idea. We develop multiple creative angles, hooks, and iterations so your team can continuously test and improve performance.',
+    number: '03',
+    title: 'Optimization',
+    summary: 'Winning ads aren’t built once, they’re refined over time. We keep your creative pipeline full of fresh concepts so your team can continuously test, learn, and improve performance.',
+    items: [
+      { title: 'Performance Analysis', icon: 'PerformanceIcon.png', text: 'We break down the data to find what’s working, what’s not, and why.' },
+      { title: 'Creative Testing', icon: 'CreativeTestingIcon.png', text: 'We continuously test new hooks, angles, and formats to uncover winning ads.' },
+      { title: 'Iteration', icon: 'IterationIcon.png', text: 'We refine, iterate, and evolve top performers to push results even further.' },
+      { title: 'Scaling Winners', icon: 'ScalingIcon.png', text: 'We double down on what works, scaling the creative that drives the best business outcomes.' },
     ],
   },
 ]
 
 const stats = [
-  {
-    value: '86%',
-    text: 'of consumers trust brands more when they use UGC',
-  },
-  {
-    value: '90%',
-    text: 'of consumers prefer to see content from actual customers.',
-  },
-  {
-    value: '80%',
-    text: 'of consumer look to non-brand experts as their first for brand info',
-  },
+  { value: '60%', icon: '60_Icon.png', text: 'of US adults are less likely to buy products or services from companies that show the same ad repeatedly' },
+  { value: '88%', icon: '88_Icon.png', text: 'say overly repetitive ads make them pay less attention' },
+  { value: '76%', icon: '76_Icon.png', text: 'say overly repetitive ads makes them less favorable toward the brand.' },
 ]
 
 const faqs = [
-  {
-    title: 'What is UGC?',
-    body: [
-      'User-Generated Content (UGC) is advertising that feels like content, not a commercial. It uses authentic creators, relatable storytelling, and native social media formats to build trust and encourage action.',
-      'Consumers are far more likely to engage with content that feels genuine, making UGC one of the highest-performing creative formats for modern paid advertising.',
-      "At Hyacinth Advertising, we combine creator-led content with performance marketing strategy to produce UGC that's built to do more than earn views. It helps brands acquire customers, improve conversion rates, and continuously test new creatives that drive growth.",
-    ],
-  },
-  {
-    title: 'Do you provide creators?',
-    body: [
-      'Yes. We source creators that align with your audience and manage the production process from concept to delivery.',
-    ],
-  },
-  {
-    title: 'What platforms do you create for?',
-    body: ['TikTok, Instagram, Facebook, YouTube Shorts, LinkedIn'],
-  },
-  {
-    title: 'Do you only create UGC?',
-    body: [
-      'No. We also produce founder-led content, product demonstrations, testimonials, paid social creatives, and creative strategy.',
-    ],
-  },
-  {
-    title: 'How quickly can projects begin?',
-    body: ['Most engagements begin within one to two weeks following onboarding.'],
-  },
+  { title: 'What kind of companies do you work with?', paragraphs: ['We work with growing SaaS companies that rely on paid social advertising to acquire customers. Our best-fit clients are typically scaling their ad spend but don’t have the time or resources to build a dedicated in-house performance creative team.'] },
+  { title: 'Do you provide the creators?', paragraphs: ['Yes.', 'We source creators who match your target audience and manage the production process from start to finish. Whether your ads call for founders, customers, professionals, or lifestyle creators, we handle the recruiting, coordination, and creative direction.'] },
+  { title: 'What platforms do you create for?', paragraphs: ['We create paid social creative for:'], list: ['Meta (Facebook & Instagram)', 'TikTok', 'YouTube Shorts', 'LinkedIn'], after: 'Every creative is tailored to the platform it’s intended to run on.' },
+  { title: 'How is this different from hiring freelancers?', paragraphs: ['Hiring individual freelancers means managing strategy, scripting, creator sourcing, revisions, and production yourself.', 'We provide a complete creative system. Instead of coordinating multiple people, you work with one team that owns the entire process and continuously delivers fresh creative for testing.'] },
+  { title: 'How do you measure success?', paragraphs: ['Our goal isn’t simply to produce videos—it’s to create creative that improves business results. We work alongside your marketing team to build a repeatable testing process, helping you continuously introduce new concepts, combat creative fatigue, and improve paid advertising performance over time.'] },
+  { title: 'How quickly can we get started?', paragraphs: ['Most projects begin within one to two weeks after onboarding.', 'Once strategy is complete, we begin sourcing creators, developing concepts, and producing your first batch of creatives.'] },
 ]
 
-const openServices = ref([])
-const openFaqs = ref([])
-const formSubmitted = ref(false)
-const mobileMenuOpen = ref(false)
-const currentPage = ref('home')
+const legalContent = computed(() => currentPage.value === 'terms' ? {
+  title: 'Terms and Conditions',
+  sections: [
+    ['Agreement to Terms', 'By accessing this website or contacting Hyacinth Advertising, you agree to these Terms and Conditions. If you do not agree, do not use this website.'],
+    ['Services', 'Hyacinth Advertising provides creative strategy, creator-led content production, direct-response advertising creative, and related marketing services. Deliverables, timelines, and pricing are defined in written client agreements.'],
+    ['Intellectual Property', 'Ownership and usage rights for creative work are governed by the applicable client agreement. Hyacinth Advertising retains rights to its pre-existing materials, processes, templates, and know-how.'],
+    ['No Guaranteed Results', 'We create content intended to improve advertising performance, but do not guarantee specific sales, revenue, engagement, conversion rates, platform approvals, or campaign outcomes.'],
+    ['Contact', 'Questions about these terms can be sent to hello@hyacinthadvertising.com.'],
+  ],
+} : {
+  title: 'Privacy Policy',
+  sections: [
+    ['Information We Collect', 'We may collect information you submit through this website, including your name, business name, email address, and any additional information you provide.'],
+    ['How We Use Information', 'We use collected information to respond to inquiries, schedule calls, provide and improve services, and understand website performance.'],
+    ['Sharing Information', 'We do not sell personal information. We may share information with service providers that help us operate the website and deliver services, or when required by law.'],
+    ['Data Retention and Security', 'We retain information only as long as reasonably needed and use reasonable safeguards, though no electronic transmission is completely secure.'],
+    ['Contact', 'Questions about this policy can be sent to hello@hyacinthadvertising.com.'],
+  ],
+})
 
-function toggleIndex(collection, index) {
-  return collection.includes(index)
-    ? collection.filter((item) => item !== index)
-    : [...collection, index]
+function selectStage(index) {
+  if (index === activeStage.value) return
+  slideDirection.value = index > activeStage.value ? 'forward' : 'backward'
+  activeStage.value = index
 }
 
-function toggleService(index) {
-  openServices.value = toggleIndex(openServices.value, index)
+function isNavActive(href) {
+  return (href === '#home' && currentPage.value === 'home') || href === `#/${currentPage.value}`
 }
 
-function toggleFaq(index) {
-  openFaqs.value = toggleIndex(openFaqs.value, index)
-}
-
-function handleBookingSubmit() {
-  formSubmitted.value = true
-}
-
-function toggleMobileMenu() {
-  mobileMenuOpen.value = !mobileMenuOpen.value
-}
-
-function closeMobileMenu() {
-  mobileMenuOpen.value = false
-}
-
-function scrollToHash(hash) {
-  if (!hash || hash.startsWith('#/')) {
-    window.scrollTo({ top: 0 })
-    return
-  }
-
-  window.setTimeout(() => {
-    document.querySelector(hash)?.scrollIntoView()
-  }, 0)
+function handleStageKeydown(event, index) {
+  let next = index
+  if (event.key === 'ArrowRight' || event.key === 'ArrowDown') next = (index + 1) % processStages.length
+  else if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') next = (index - 1 + processStages.length) % processStages.length
+  else if (event.key === 'Home') next = 0
+  else if (event.key === 'End') next = processStages.length - 1
+  else return
+  event.preventDefault()
+  selectStage(next)
+  nextTick(() => document.getElementById(`process-tab-${next}`)?.focus())
 }
 
 async function syncRoute() {
   const hash = window.location.hash
-
-  if (hash === '#/terms') {
-    currentPage.value = 'terms'
-  } else if (hash === '#/privacy') {
-    currentPage.value = 'privacy'
-  } else {
-    currentPage.value = 'home'
-  }
-
-  closeMobileMenu()
+  currentPage.value = hash === '#/terms' ? 'terms' : hash === '#/privacy' ? 'privacy' : hash === '#/about' ? 'about' : hash === '#/faq' ? 'faq' : 'home'
+  mobileMenuOpen.value = false
   await nextTick()
-
-  if (currentPage.value === 'home') {
-    scrollToHash(hash)
-  } else {
-    window.scrollTo({ top: 0 })
-  }
+  if (currentPage.value !== 'home') window.scrollTo({ top: 0 })
+  else if (hash && !hash.startsWith('#/')) setTimeout(() => document.querySelector(hash)?.scrollIntoView(), 0)
 }
 
 onMounted(() => {
   syncRoute()
   window.addEventListener('hashchange', syncRoute)
 })
-
-onUnmounted(() => {
-  window.removeEventListener('hashchange', syncRoute)
-})
+onUnmounted(() => window.removeEventListener('hashchange', syncRoute))
 </script>
 
 <template>
-  <div class="min-h-screen bg-white text-neutral-950">
-    <header
-      class="sticky top-0 z-50 border-b border-neutral-200/80 bg-white/95 backdrop-blur"
-    >
-      <div
-        class="mx-auto grid max-w-7xl grid-cols-[auto_auto] items-center justify-between gap-x-5 gap-y-3 px-5 py-4 sm:px-8 lg:grid-cols-[auto_1fr_auto] lg:px-10"
-      >
-        <a
-          href="#home"
-          aria-label="Hyacinth Advertising home"
-          class="shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-neutral-950 focus-visible:ring-offset-4"
-          @click="closeMobileMenu"
-        >
-          <img
-            :src="`${baseUrl}logo.png`"
-            alt="Hyacinth Advertising"
-            class="h-8 w-40 object-cover object-center sm:h-10 sm:w-56"
-          />
+  <div class="site-shell">
+    <header class="site-header">
+      <div class="container header-inner">
+        <a href="#home" class="brand" aria-label="Hyacinth Advertising home">
+          <span>Hyacinth Advertising</span>
         </a>
-
-        <nav
-          aria-label="Primary navigation"
-          class="hidden items-center justify-center gap-x-8 text-[0.72rem] font-semibold uppercase tracking-[0.28em] text-neutral-700 lg:flex"
-        >
-          <a
-            v-for="item in navItems"
-            :key="item.href"
-            :href="item.href"
-            class="transition hover:text-neutral-950 focus:outline-none focus-visible:ring-2 focus-visible:ring-neutral-950 focus-visible:ring-offset-4"
-          >
-            {{ item.label }}
-          </a>
+        <nav class="desktop-nav" aria-label="Primary navigation">
+          <a v-for="item in navItems" :key="item.href" :href="item.href" :class="{ active: isNavActive(item.href) }" :aria-current="isNavActive(item.href) ? 'page' : undefined">{{ item.label }}</a>
         </nav>
-
-        <a
-          :href="bookCallHref"
-          class="hidden min-h-11 items-center justify-center justify-self-end border border-neutral-950 bg-neutral-950 px-5 text-xs font-black uppercase tracking-[0.22em] text-white transition hover:bg-white hover:text-neutral-950 focus:outline-none focus-visible:ring-2 focus-visible:ring-neutral-950 focus-visible:ring-offset-4 lg:inline-flex"
-        >
-          Book a Call
-        </a>
-
-        <button
-          type="button"
-          class="grid h-11 w-11 place-items-center justify-self-end border border-neutral-950 text-neutral-950 transition hover:bg-neutral-950 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-neutral-950 focus-visible:ring-offset-4 lg:hidden"
-          :aria-expanded="mobileMenuOpen"
-          aria-controls="mobile-menu"
-          aria-label="Toggle navigation menu"
-          @click="toggleMobileMenu"
-        >
-          <span class="grid gap-1.5" aria-hidden="true">
-            <span
-              class="block h-0.5 w-5 bg-current transition"
-              :class="{ 'translate-y-2 rotate-45': mobileMenuOpen }"
-            ></span>
-            <span
-              class="block h-0.5 w-5 bg-current transition"
-              :class="{ 'opacity-0': mobileMenuOpen }"
-            ></span>
-            <span
-              class="block h-0.5 w-5 bg-current transition"
-              :class="{ '-translate-y-2 -rotate-45': mobileMenuOpen }"
-            ></span>
-          </span>
+        <a href="#book-call" class="button header-cta">Book a Call</a>
+        <button class="menu-button" type="button" :aria-expanded="mobileMenuOpen" aria-controls="mobile-menu" aria-label="Toggle navigation" @click="mobileMenuOpen = !mobileMenuOpen">
+          <span></span><span></span><span></span>
         </button>
       </div>
-
-      <nav
-        id="mobile-menu"
-        v-show="mobileMenuOpen"
-        aria-label="Mobile navigation"
-        class="border-t border-neutral-200 px-5 pb-5 pt-2 sm:px-8 lg:hidden"
-      >
-        <div class="mx-auto grid max-w-7xl gap-1">
-          <a
-            v-for="item in navItems"
-            :key="item.href"
-            :href="item.href"
-            class="border-b border-neutral-200 py-3 text-sm font-black uppercase tracking-[0.24em] text-neutral-800 transition hover:text-neutral-950 focus:outline-none focus-visible:ring-2 focus-visible:ring-neutral-950 focus-visible:ring-offset-4"
-            @click="closeMobileMenu"
-          >
-            {{ item.label }}
-          </a>
-
-          <a
-            :href="bookCallHref"
-            class="mt-4 inline-flex min-h-12 w-fit items-center justify-center border border-neutral-950 bg-neutral-950 px-6 text-sm font-black uppercase tracking-[0.22em] text-white transition hover:bg-white hover:text-neutral-950 focus:outline-none focus-visible:ring-2 focus-visible:ring-neutral-950 focus-visible:ring-offset-4"
-            @click="closeMobileMenu"
-          >
-            Book a Call
-          </a>
-        </div>
+      <nav v-show="mobileMenuOpen" id="mobile-menu" class="mobile-nav" aria-label="Mobile navigation">
+        <a v-for="item in navItems" :key="item.href" :href="item.href" :aria-current="isNavActive(item.href) ? 'page' : undefined" @click="mobileMenuOpen = false">{{ item.label }}</a>
+        <a href="#book-call" @click="mobileMenuOpen = false">Book a Call</a>
       </nav>
     </header>
 
     <main v-if="currentPage === 'home'">
-      <section
-        id="home"
-        class="mx-auto max-w-7xl scroll-mt-24 px-5 pb-16 pt-5 sm:px-8 sm:pb-24 sm:pt-7 lg:px-10"
-      >
-        <div class="mx-auto max-w-6xl text-center">
-          <h1
-            class="text-[clamp(2.35rem,5vw,4.9rem)] font-black uppercase leading-[0.95] tracking-normal"
-          >
-            We create Ads that convert
-          </h1>
+      <section id="home" class="container hero">
+        <div class="hero-copy">
+          <h1>We create ads<br />that convert.</h1>
+          <p>We help AI &amp; SaaS companies scale paid advertising by becoming their external performance creative team.</p>
+          <a href="#book-call" class="button">Book a Call <span aria-hidden="true">→</span></a>
         </div>
-
-        <div class="mx-auto mt-7 max-w-3xl overflow-hidden border border-neutral-200 bg-neutral-100 sm:mt-9">
-          <img
-            :src="`${baseUrl}home.png`"
-            alt="Production crew filming creator-led advertising content"
-            class="aspect-[1400/700] w-full object-cover"
-          />
-        </div>
-
-        <div class="mt-8 flex justify-center">
-          <a
-            :href="bookCallHref"
-            class="inline-flex min-h-12 items-center justify-center border border-neutral-950 bg-neutral-950 px-7 text-sm font-black uppercase tracking-[0.22em] text-white transition hover:bg-white hover:text-neutral-950 focus:outline-none focus-visible:ring-2 focus-visible:ring-neutral-950 focus-visible:ring-offset-4"
-          >
-            Book a Call
-          </a>
-        </div>
+        <div class="hero-image"><img :src="`${baseUrl}hero-team.png`" alt="The Hyacinth Advertising founders" /></div>
       </section>
 
-      <section
-        id="services"
-        class="border-b border-neutral-200 bg-white px-5 py-16 sm:px-8 sm:py-24 lg:px-10"
-      >
-        <div class="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[0.78fr_1.22fr]">
+      <section id="process" class="process-section">
+        <div class="container process-intro">
           <div>
-            <h2 class="text-5xl font-black uppercase leading-none sm:text-6xl lg:text-7xl">
-              What We Do
-            </h2>
+            <h2>Our Process</h2>
+            <p>Every month we introduce fresh hooks, messaging angles, creators, and concepts so your team can continuously fight creative fatigue.</p>
           </div>
+          <div class="stage-tabs" role="tablist" aria-label="Our process stages">
+            <button v-for="(stage, index) in processStages" :id="`process-tab-${index}`" :key="stage.title" class="stage-tab" :class="{ active: activeStage === index }" type="button" role="tab" :aria-selected="activeStage === index" :aria-controls="`process-panel-${index}`" :tabindex="activeStage === index ? 0 : -1" @click="selectStage(index)" @keydown="handleStageKeydown($event, index)">
+              <span class="flower-window"><span class="flower-strip" :style="{ backgroundImage: `url(${baseUrl}hyacinth-stages.png)`, backgroundPosition: `${flowerPositions[index]}% top` }"></span></span>
+              <span class="stage-number">{{ stage.number }}</span>
+              <span class="stage-dot" aria-hidden="true"></span>
+              <span class="stage-name">{{ stage.title }}</span>
+            </button>
+          </div>
+        </div>
 
-          <div class="border-t border-neutral-950">
-            <div
-              v-for="(item, index) in services"
-              :key="item.title"
-              class="border-b border-neutral-300"
-            >
-              <button
-                type="button"
-                class="flex w-full items-center justify-between gap-6 py-5 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-neutral-950 focus-visible:ring-offset-4"
-                :aria-expanded="openServices.includes(index)"
-                :aria-controls="`service-panel-${index}`"
-                @click="toggleService(index)"
-              >
-                <span class="text-2xl font-black uppercase leading-none sm:text-3xl">
-                  {{ item.title }}
-                </span>
-                <span
-                  class="grid h-9 w-9 shrink-0 place-items-center border border-neutral-950 text-2xl leading-none"
-                  aria-hidden="true"
-                >
-                  <span class="relative h-4 w-4 -translate-y-px">
-                    <span
-                      class="absolute left-0 top-1/2 h-0.5 w-4 -translate-y-1/2 bg-current"
-                    ></span>
-                    <span
-                      class="absolute left-1/2 top-0 h-4 w-0.5 -translate-x-1/2 bg-current transition duration-200"
-                      :class="openServices.includes(index) ? 'rotate-90 opacity-0' : 'rotate-0 opacity-100'"
-                    ></span>
-                  </span>
-                </span>
-              </button>
-
-              <div
-                v-show="openServices.includes(index)"
-                :id="`service-panel-${index}`"
-                class="max-w-3xl pb-8 text-lg leading-8 text-neutral-700"
-              >
-                <p v-for="paragraph in item.body" :key="paragraph" class="mb-4 last:mb-0">
-                  {{ paragraph }}
-                </p>
+        <div class="container process-card-wrap">
+          <Transition :name="slideDirection === 'forward' ? 'slide-forward' : 'slide-backward'" mode="out-in">
+            <article :id="`process-panel-${activeStage}`" :key="activeStage" class="process-card" :class="{ 'strategy-stage': activeStage === 0 }" role="tabpanel" :aria-labelledby="`process-tab-${activeStage}`">
+              <div class="stage-summary">
+                <span>{{ processStages[activeStage].number }}</span>
+                <h3>{{ processStages[activeStage].title }}</h3>
+                <p>{{ processStages[activeStage].summary }}</p>
               </div>
-            </div>
-          </div>
+              <div class="process-items">
+                <div v-for="item in processStages[activeStage].items" :key="item.title" class="process-item">
+                  <img :src="`${baseUrl}Icons/${item.icon}`" alt="" />
+                  <h4>{{ item.title }}</h4>
+                  <p>{{ item.text }}</p>
+                </div>
+              </div>
+            </article>
+          </Transition>
+          <p class="process-hint"><img :src="`${baseUrl}Icons/InfoIcon.png`" alt="" /> Click any stage above to explore our process</p>
         </div>
       </section>
 
-      <section id="ugc" class="bg-neutral-950 px-5 py-16 text-white sm:px-8 sm:py-24 lg:px-10">
-        <div class="mx-auto max-w-7xl">
-          <h2 class="max-w-4xl text-5xl font-black uppercase leading-none sm:text-7xl">
-            The Numbers Are In
-          </h2>
-
-          <div class="mt-12 grid gap-4 md:grid-cols-3">
-            <article
-              v-for="stat in stats"
-              :key="stat.value"
-              class="border border-white/25 p-7 sm:p-8"
-            >
-              <p class="text-6xl font-black leading-none sm:text-7xl">{{ stat.value }}</p>
-              <p class="mt-6 text-xl leading-8 text-neutral-200">{{ stat.text }}</p>
+      <section class="stats-section">
+        <div class="container">
+          <h2>Winning paid advertising is<br />about consistently testing new creative.</h2>
+          <div class="stats-card">
+            <article v-for="stat in stats" :key="stat.value">
+              <span class="icon-tile"><img :src="`${baseUrl}Icons/${stat.icon}`" alt="" /></span>
+              <strong>{{ stat.value }}</strong>
+              <p>{{ stat.text }}</p>
             </article>
           </div>
+          <p class="source"><img :src="`${baseUrl}Icons/InfoIcon.png`" alt="" /> <strong>Source:</strong> EMARKETER, citing Clutch Consumer Advertising Survey (2025)</p>
         </div>
       </section>
 
-      <section
-        id="faq"
-        class="border-t border-neutral-200 bg-white px-5 py-16 sm:px-8 sm:py-24 lg:px-10"
-      >
-        <div class="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[0.78fr_1.22fr]">
-          <div>
-            <h2 class="text-5xl font-black uppercase leading-none sm:text-6xl lg:text-7xl">
-              FAQs
-            </h2>
+      <section id="book-call" class="booking-section">
+        <div class="container booking-grid">
+          <div class="booking-copy">
+            <h2>Book a call</h2>
+            <p>Let’s talk about your goals and how we can help you scale with better creative.</p>
+            <ul>
+              <li><img :src="`${baseUrl}Icons/BookACallIcon1.png`" alt="" /><span><strong>30 minute call</strong>Online via Google Meet</span></li>
+              <li><img :src="`${baseUrl}Icons/BookACallIcon2.png`" alt="" /><span><strong>Quick &amp; easy</strong>Pick a time that works for you</span></li>
+              <li><img :src="`${baseUrl}Icons/BookACallIcon3.png`" alt="" /><span><strong>No commitment</strong>Just a conversation</span></li>
+            </ul>
           </div>
-
-          <div class="border-t border-neutral-950">
-            <div
-              v-for="(item, index) in faqs"
-              :key="item.title"
-              class="border-b border-neutral-300"
-            >
-              <button
-                type="button"
-                class="flex w-full items-center justify-between gap-6 py-5 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-neutral-950 focus-visible:ring-offset-4"
-                :aria-expanded="openFaqs.includes(index)"
-                :aria-controls="`faq-panel-${index}`"
-                @click="toggleFaq(index)"
-              >
-                <span class="text-2xl font-black uppercase leading-none sm:text-3xl">
-                  {{ item.title }}
-                </span>
-                <span
-                  class="grid h-9 w-9 shrink-0 place-items-center border border-neutral-950 text-2xl leading-none"
-                  aria-hidden="true"
-                >
-                  <span class="relative h-4 w-4 -translate-y-px">
-                    <span
-                      class="absolute left-0 top-1/2 h-0.5 w-4 -translate-y-1/2 bg-current"
-                    ></span>
-                    <span
-                      class="absolute left-1/2 top-0 h-4 w-0.5 -translate-x-1/2 bg-current transition duration-200"
-                      :class="openFaqs.includes(index) ? 'rotate-90 opacity-0' : 'rotate-0 opacity-100'"
-                    ></span>
-                  </span>
-                </span>
-              </button>
-
-              <div
-                v-show="openFaqs.includes(index)"
-                :id="`faq-panel-${index}`"
-                class="max-w-3xl pb-8 text-lg leading-8 text-neutral-700"
-              >
-                <p v-for="paragraph in item.body" :key="paragraph" class="mb-4 last:mb-0">
-                  {{ paragraph }}
-                </p>
-              </div>
+          <form class="booking-form" @submit.prevent="formSubmitted = true">
+            <div class="form-row">
+              <label>First Name<input required name="firstName" autocomplete="given-name" /></label>
+              <label>Last Name<input required name="lastName" autocomplete="family-name" /></label>
             </div>
-          </div>
-        </div>
-      </section>
-
-      <section id="about" class="bg-neutral-950 px-5 py-16 text-white sm:px-8 sm:py-24 lg:px-10">
-        <div class="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[0.78fr_1.22fr]">
-          <div>
-            <h2 class="text-5xl font-black uppercase leading-none sm:text-6xl lg:text-7xl">
-              About Hyacinth
-            </h2>
-          </div>
-
-          <div class="max-w-4xl text-xl leading-9 text-neutral-200">
-            <p class="mb-6">
-              After years of creating commercial-quality video content, we noticed something:
-              the ads that consistently perform best don't look like ads at all. They feel
-              authentic, relatable, and built for the platforms people actually use every day.
-            </p>
-            <p class="mb-6 font-semibold text-white">That's why we started Hyacinth.</p>
-            <p class="mb-6">
-              We partner with brands to produce high-performing UGC-style advertising by managing
-              every step of the creative process, from strategy and scripting to creator sourcing,
-              filming, editing, and delivery. Instead of chasing one-off viral videos, we help
-              brands build a consistent pipeline of fresh creative they can confidently use across
-              TikTok, Instagram, Facebook, and beyond.
-            </p>
-            <p>
-              Our goal is simple: create content that earns attention, builds trust, and drives
-              results.
-            </p>
-          </div>
+            <label>Business Name<input required name="businessName" autocomplete="organization" /></label>
+            <label>Email Address<input required type="email" name="email" autocomplete="email" /></label>
+            <label>Additional Info (Optional)<textarea name="additionalInfo" rows="5"></textarea></label>
+            <button class="button" type="submit">Book a Call <span aria-hidden="true">→</span></button>
+            <p v-if="formSubmitted" class="form-success" role="status">Thanks! We’ll be in touch.</p>
+            <p class="secure-note"><img :src="`${baseUrl}Icons/SecureIcon.png`" alt="" /> Your information is secure and will never be shared.</p>
+          </form>
         </div>
       </section>
     </main>
 
-    <main v-else class="px-5 py-16 sm:px-8 sm:py-24 lg:px-10">
-      <section v-if="currentPage === 'terms'" class="mx-auto max-w-4xl">
-        <a
-          href="#home"
-          class="mb-10 inline-flex text-sm font-black uppercase tracking-[0.22em] text-neutral-600 transition hover:text-neutral-950 focus:outline-none focus-visible:ring-2 focus-visible:ring-neutral-950 focus-visible:ring-offset-4"
-        >
-          Back to Home
-        </a>
-
-        <h1 class="text-5xl font-black uppercase leading-none sm:text-7xl">
-          Terms and Conditions
-        </h1>
-        <p class="mt-5 text-sm font-semibold uppercase tracking-[0.22em] text-neutral-500">
-          Last updated: June 26, 2026
-        </p>
-
-        <div class="mt-12 grid gap-9 text-lg leading-8 text-neutral-700">
-          <section>
-            <h2 class="mb-3 text-2xl font-black uppercase leading-none text-neutral-950">
-              Agreement to Terms
-            </h2>
-            <p>
-              By accessing this website or contacting Hyacinth Advertising, you agree to these
-              Terms and Conditions. If you do not agree with these terms, do not use this website.
-            </p>
-          </section>
-
-          <section>
-            <h2 class="mb-3 text-2xl font-black uppercase leading-none text-neutral-950">
-              Services
-            </h2>
-            <p>
-              Hyacinth Advertising provides creative strategy, creator-led content production,
-              direct-response advertising creative, and related marketing services. Specific
-              deliverables, timelines, and pricing are defined in written proposals, statements of
-              work, or other agreements between Hyacinth Advertising and each client.
-            </p>
-          </section>
-
-          <section>
-            <h2 class="mb-3 text-2xl font-black uppercase leading-none text-neutral-950">
-              Client Materials and Approvals
-            </h2>
-            <p>
-              Clients are responsible for providing accurate product information, brand guidelines,
-              usage rights, and other materials needed for production. Clients are also responsible
-              for reviewing and approving final content before publication or paid distribution.
-            </p>
-          </section>
-
-          <section>
-            <h2 class="mb-3 text-2xl font-black uppercase leading-none text-neutral-950">
-              Intellectual Property
-            </h2>
-            <p>
-              Ownership and usage rights for creative work are governed by the applicable client
-              agreement. Unless otherwise agreed in writing, Hyacinth Advertising retains rights to
-              its pre-existing materials, processes, templates, and know-how.
-            </p>
-          </section>
-
-          <section>
-            <h2 class="mb-3 text-2xl font-black uppercase leading-none text-neutral-950">
-              No Guaranteed Results
-            </h2>
-            <p>
-              Hyacinth Advertising creates content intended to improve advertising performance, but
-              does not guarantee specific sales, revenue, engagement, conversion rates, platform
-              approvals, or campaign outcomes.
-            </p>
-          </section>
-
-          <section>
-            <h2 class="mb-3 text-2xl font-black uppercase leading-none text-neutral-950">
-              Third-Party Platforms
-            </h2>
-            <p>
-              Social media, advertising, analytics, payment, scheduling, and creator platforms are
-              operated by third parties. Hyacinth Advertising is not responsible for changes,
-              outages, policy decisions, or actions taken by those platforms.
-            </p>
-          </section>
-
-          <section>
-            <h2 class="mb-3 text-2xl font-black uppercase leading-none text-neutral-950">
-              Limitation of Liability
-            </h2>
-            <p>
-              To the fullest extent permitted by law, Hyacinth Advertising is not liable for
-              indirect, incidental, consequential, special, or punitive damages arising from use of
-              this website or services.
-            </p>
-          </section>
-
-          <section>
-            <h2 class="mb-3 text-2xl font-black uppercase leading-none text-neutral-950">
-              Contact
-            </h2>
-            <p>
-              Questions about these terms can be sent through the Book a Call form on this website.
-            </p>
-          </section>
+    <main v-else-if="currentPage === 'about'" class="inner-page container">
+      <section class="about-page-grid">
+        <div class="inner-page-title">
+          <span>About Us</span>
+          <h1>About<br />Hyacinth</h1>
         </div>
-      </section>
-
-      <section v-else class="mx-auto max-w-4xl">
-        <a
-          href="#home"
-          class="mb-10 inline-flex text-sm font-black uppercase tracking-[0.22em] text-neutral-600 transition hover:text-neutral-950 focus:outline-none focus-visible:ring-2 focus-visible:ring-neutral-950 focus-visible:ring-offset-4"
-        >
-          Back to Home
-        </a>
-
-        <h1 class="text-5xl font-black uppercase leading-none sm:text-7xl">
-          Privacy Policy
-        </h1>
-        <p class="mt-5 text-sm font-semibold uppercase tracking-[0.22em] text-neutral-500">
-          Last updated: June 26, 2026
-        </p>
-
-        <div class="mt-12 grid gap-9 text-lg leading-8 text-neutral-700">
-          <section>
-            <h2 class="mb-3 text-2xl font-black uppercase leading-none text-neutral-950">
-              Information We Collect
-            </h2>
-            <p>
-              We may collect information you submit through this website, including your first name,
-              last name, business name, email address, and any additional information you choose to
-              provide. We may also collect basic website usage information such as device, browser,
-              pages visited, and referral source.
-            </p>
-          </section>
-
-          <section>
-            <h2 class="mb-3 text-2xl font-black uppercase leading-none text-neutral-950">
-              How We Use Information
-            </h2>
-            <p>
-              We use collected information to respond to inquiries, schedule calls, provide and
-              improve services, understand website performance, and communicate about Hyacinth
-              Advertising.
-            </p>
-          </section>
-
-          <section>
-            <h2 class="mb-3 text-2xl font-black uppercase leading-none text-neutral-950">
-              Sharing Information
-            </h2>
-            <p>
-              We do not sell personal information. We may share information with service providers
-              that help operate the website, schedule calls, manage communications, or deliver
-              services, and when required by law or necessary to protect our rights.
-            </p>
-          </section>
-
-          <section>
-            <h2 class="mb-3 text-2xl font-black uppercase leading-none text-neutral-950">
-              Cookies and Analytics
-            </h2>
-            <p>
-              This website may use cookies or analytics tools to understand traffic and improve the
-              website experience. You can adjust browser settings to block or delete cookies.
-            </p>
-          </section>
-
-          <section>
-            <h2 class="mb-3 text-2xl font-black uppercase leading-none text-neutral-950">
-              Data Retention and Security
-            </h2>
-            <p>
-              We keep information only as long as reasonably needed for business, legal, and
-              operational purposes. We use reasonable safeguards, but no website or electronic
-              transmission is completely secure.
-            </p>
-          </section>
-
-          <section>
-            <h2 class="mb-3 text-2xl font-black uppercase leading-none text-neutral-950">
-              Your Choices
-            </h2>
-            <p>
-              You may request that we update, correct, or delete information you have provided by
-              contacting us through the Book a Call form. Some information may be retained when
-              required for legal or legitimate business purposes.
-            </p>
-          </section>
-
-          <section>
-            <h2 class="mb-3 text-2xl font-black uppercase leading-none text-neutral-950">
-              Children's Privacy
-            </h2>
-            <p>
-              This website is not intended for children under 13, and we do not knowingly collect
-              personal information from children.
-            </p>
-          </section>
-
-          <section>
-            <h2 class="mb-3 text-2xl font-black uppercase leading-none text-neutral-950">
-              Contact
-            </h2>
-            <p>
-              Questions about this Privacy Policy can be sent through the Book a Call form on this
-              website.
-            </p>
-          </section>
+        <div class="about-page-copy">
+          <p>After years of creating commercial-quality video content, we noticed something: the ads that consistently perform best don’t look like ads at all. They feel authentic, relatable, and built for the platforms people actually use every day.</p>
+          <p><strong>That’s why we started Hyacinth.</strong></p>
+          <p>We partner with brands to produce high-performing paid ad creative by managing every step of the creative process, from strategy and scripting to creator sourcing, filming, editing, and delivery. Instead of chasing one-off viral videos, we help brands build a consistent pipeline of fresh creative they can confidently use across TikTok, Instagram, Facebook, and beyond.</p>
+          <p>Our goal is simple: create content that earns attention, builds trust, and drives results.</p>
         </div>
       </section>
     </main>
 
-    <footer
-      v-if="currentPage === 'home'"
-      id="book-call"
-      class="scroll-mt-32 border-t border-neutral-200 px-5 pb-10 pt-16 sm:px-8 sm:pb-8 sm:pt-24 lg:px-10"
-    >
-      <div class="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[0.78fr_1.22fr]">
-        <div>
-          <h2 class="text-5xl font-black uppercase leading-none sm:text-6xl lg:text-7xl">
-            Book a Call
-          </h2>
+    <main v-else-if="currentPage === 'faq'" class="inner-page faq-page container">
+      <section class="faq-page-grid">
+        <div class="inner-page-title">
+          <span>FAQs</span>
+          <h1>Frequently<br />Asked Questions</h1>
         </div>
+        <ol class="faq-list">
+          <li v-for="(faq, index) in faqs" :key="faq.title">
+            <span class="faq-number">{{ String(index + 1).padStart(2, '0') }}</span>
+            <div>
+              <h2>{{ faq.title }}</h2>
+              <p v-for="paragraph in faq.paragraphs" :key="paragraph">{{ paragraph }}</p>
+              <ul v-if="faq.list"><li v-for="item in faq.list" :key="item">{{ item }}</li></ul>
+              <p v-if="faq.after">{{ faq.after }}</p>
+            </div>
+          </li>
+        </ol>
+      </section>
+    </main>
 
-        <form class="grid gap-5" @submit.prevent="handleBookingSubmit">
-          <div class="grid gap-5 sm:grid-cols-2">
-            <label class="grid gap-2 text-xs font-black uppercase tracking-[0.22em]">
-              First Name
-              <input
-                type="text"
-                name="firstName"
-                autocomplete="given-name"
-                required
-                class="min-h-12 border border-neutral-300 px-4 text-base font-medium normal-case tracking-normal text-neutral-950 outline-none transition focus:border-neutral-950 focus:ring-2 focus:ring-neutral-950/20"
-              />
-            </label>
+    <main v-else class="legal-page container">
+      <a href="#home" class="back-link">← Back to Home</a>
+      <h1>{{ legalContent.title }}</h1>
+      <p class="legal-date">Last updated: June 26, 2026</p>
+      <section v-for="section in legalContent.sections" :key="section[0]">
+        <h2>{{ section[0] }}</h2><p>{{ section[1] }}</p>
+      </section>
+    </main>
 
-            <label class="grid gap-2 text-xs font-black uppercase tracking-[0.22em]">
-              Last Name
-              <input
-                type="text"
-                name="lastName"
-                autocomplete="family-name"
-                required
-                class="min-h-12 border border-neutral-300 px-4 text-base font-medium normal-case tracking-normal text-neutral-950 outline-none transition focus:border-neutral-950 focus:ring-2 focus:ring-neutral-950/20"
-              />
-            </label>
-          </div>
-
-          <label class="grid gap-2 text-xs font-black uppercase tracking-[0.22em]">
-            Business Name
-            <input
-              type="text"
-              name="businessName"
-              autocomplete="organization"
-              required
-              class="min-h-12 border border-neutral-300 px-4 text-base font-medium normal-case tracking-normal text-neutral-950 outline-none transition focus:border-neutral-950 focus:ring-2 focus:ring-neutral-950/20"
-            />
-          </label>
-
-          <label class="grid gap-2 text-xs font-black uppercase tracking-[0.22em]">
-            Email Address
-            <input
-              type="email"
-              name="email"
-              autocomplete="email"
-              required
-              class="min-h-12 border border-neutral-300 px-4 text-base font-medium normal-case tracking-normal text-neutral-950 outline-none transition focus:border-neutral-950 focus:ring-2 focus:ring-neutral-950/20"
-            />
-          </label>
-
-          <label class="grid gap-2 text-xs font-black uppercase tracking-[0.22em]">
-            Additional Info <span class="text-neutral-500">(Optional)</span>
-            <textarea
-              name="additionalInfo"
-              rows="5"
-              class="resize-y border border-neutral-300 px-4 py-3 text-base font-medium normal-case tracking-normal text-neutral-950 outline-none transition focus:border-neutral-950 focus:ring-2 focus:ring-neutral-950/20"
-            ></textarea>
-          </label>
-
-          <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <button
-              type="submit"
-              class="inline-flex min-h-12 w-fit items-center justify-center border border-neutral-950 bg-neutral-950 px-7 text-sm font-black uppercase tracking-[0.22em] text-white transition hover:bg-white hover:text-neutral-950 focus:outline-none focus-visible:ring-2 focus-visible:ring-neutral-950 focus-visible:ring-offset-4"
-            >
-              Book a Call
-            </button>
-
-            <p v-if="formSubmitted" class="text-sm font-semibold uppercase tracking-[0.18em] text-neutral-600">
-              Thanks. We'll be in touch.
-            </p>
-          </div>
-        </form>
-      </div>
-
-      <div
-        class="mx-auto mt-14 flex max-w-7xl flex-col gap-4 border-t border-neutral-200 pt-8 text-sm font-semibold uppercase tracking-[0.25em] text-neutral-500 sm:flex-row sm:items-center sm:justify-between"
-      >
-        <span>Hyacinth Advertising, LLC</span>
-        <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-8">
-          <a href="#/terms" class="transition hover:text-neutral-950">Terms</a>
-          <a href="#/privacy" class="transition hover:text-neutral-950">Privacy</a>
-          <span>Ads that convert</span>
-        </div>
-      </div>
-    </footer>
-
-    <footer
-      v-else
-      class="border-t border-neutral-200 px-5 py-8 sm:px-8 lg:px-10"
-    >
-      <div
-        class="mx-auto flex max-w-7xl flex-col gap-4 text-sm font-semibold uppercase tracking-[0.25em] text-neutral-500 sm:flex-row sm:items-center sm:justify-between"
-      >
-        <a href="#home" class="transition hover:text-neutral-950">Hyacinth Advertising, LLC</a>
-        <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-8">
-          <a href="#/terms" class="transition hover:text-neutral-950">Terms</a>
-          <a href="#/privacy" class="transition hover:text-neutral-950">Privacy</a>
-        </div>
+    <footer class="site-footer">
+      <div class="container footer-inner">
+        <h2>Hyacinth Advertising LLC</h2>
+        <a href="mailto:hello@hyacinthadvertising.com"><img :src="`${baseUrl}Icons/EmailIcon.png`" alt="" /> hello@hyacinthadvertising.com</a>
+        <p>© 2026 Hyacinth Advertising LLC</p>
+        <nav aria-label="Legal"><a href="#/privacy">Privacy Policy</a><span>•</span><a href="#/terms">Terms of Service</a></nav>
       </div>
     </footer>
   </div>
