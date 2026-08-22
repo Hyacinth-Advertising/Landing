@@ -7,7 +7,9 @@ const baseUrl = import.meta.env.BASE_URL
 const currentPage = ref('home')
 const activeSection = ref('home')
 const mobileMenuOpen = ref(false)
+const processFlow = ref(null)
 const contactEnabled = computed(() => isGoogleFormUrl(googleFormUrl))
+let processObserver
 
 const navItems = [
   { label: 'Home', href: '#home', section: 'home' },
@@ -136,6 +138,35 @@ function updateActiveSection() {
   activeSection.value = window.scrollY >= about.offsetTop - window.innerHeight * 0.36 ? 'about' : 'home'
 }
 
+function setupProcessReveal() {
+  processObserver?.disconnect()
+  processObserver = undefined
+
+  const flow = processFlow.value
+  if (!flow) return
+
+  const steps = [...flow.querySelectorAll('.process-step')]
+  flow.classList.add('is-reveal-ready')
+
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches || !('IntersectionObserver' in window)) {
+    steps.forEach((step) => step.classList.add('is-visible'))
+    return
+  }
+
+  processObserver = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (!entry.isIntersecting) return
+      entry.target.classList.add('is-visible')
+      processObserver?.unobserve(entry.target)
+    })
+  }, {
+    threshold: 0.28,
+    rootMargin: '0px 0px -8% 0px',
+  })
+
+  steps.forEach((step) => processObserver.observe(step))
+}
+
 async function syncRoute() {
   const hash = window.location.hash
   currentPage.value = hash === '#/terms' ? 'terms' : hash === '#/privacy' ? 'privacy' : 'home'
@@ -143,6 +174,8 @@ async function syncRoute() {
   await nextTick()
 
   if (currentPage.value !== 'home') {
+    processObserver?.disconnect()
+    processObserver = undefined
     window.scrollTo({ top: 0 })
     return
   }
@@ -158,6 +191,7 @@ async function syncRoute() {
   }
 
   window.setTimeout(updateActiveSection, 0)
+  setupProcessReveal()
 }
 
 onMounted(() => {
@@ -167,6 +201,7 @@ onMounted(() => {
 })
 
 onUnmounted(() => {
+  processObserver?.disconnect()
   window.removeEventListener('hashchange', syncRoute)
   window.removeEventListener('scroll', updateActiveSection)
 })
@@ -311,7 +346,7 @@ onUnmounted(() => {
             <p>Our process is simple and collaborative. <br />We handle the strategy, content, and advertising <br />so you can focus on running your business.</p>
           </div>
 
-          <div class="process-flow">
+          <div ref="processFlow" class="process-flow">
             <article v-for="(step, index) in processSteps" :key="step.number" class="process-step">
               <div
                 class="process-flower"
