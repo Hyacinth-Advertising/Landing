@@ -1,69 +1,93 @@
 <script setup>
 import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue'
+import SiteIcon from './components/SiteIcon.vue'
+import { googleFormUrl, isGoogleFormUrl } from './siteConfig.js'
 
 const baseUrl = import.meta.env.BASE_URL
 const currentPage = ref('home')
+const activeSection = ref('home')
 const mobileMenuOpen = ref(false)
-const activeStage = ref(0)
-const slideDirection = ref('forward')
-const formSubmitted = ref(false)
-const flowerPositions = [15, 50, 82]
+const contactEnabled = computed(() => isGoogleFormUrl(googleFormUrl))
 
 const navItems = [
-  { label: 'Home', href: '#home' },
-  { label: 'About Us', href: '#/about' },
-  { label: 'FAQs', href: '#/faq' },
+  { label: 'Home', href: '#home', section: 'home' },
+  { label: 'About Us', href: '#about', section: 'about' },
 ]
 
-const processStages = [
+const platforms = [
+  { name: 'Facebook', icon: 'facebook' },
+  { name: 'Instagram', icon: 'instagram' },
+  { name: 'TikTok', icon: 'tiktok' },
+  { name: 'Google', icon: 'google' },
+]
+
+const services = [
+  {
+    title: 'Strategy',
+    icon: 'target',
+    text: 'We develop data-driven marketing strategies tailored to your business, audience, and goals.',
+  },
+  {
+    title: 'Content Creation',
+    icon: 'video',
+    text: 'We create scroll-stopping content that showcases your work and builds trust with your ideal customers.',
+  },
+  {
+    title: 'Social Media Services',
+    icon: 'messages',
+    text: 'We help you develop a social media strategy and put it into action with consistent, engaging content to grow your audience.',
+  },
+  {
+    title: 'Paid Advertising',
+    icon: 'trend',
+    text: 'We plan, create, and manage high-performing ad campaigns that put your business in front of the right people.',
+  },
+  {
+    title: 'Search Advertising',
+    icon: 'search',
+    text: 'We create and manage Google Search ads that capture high-intent leads when they’re searching for your services.',
+  },
+]
+
+const processSteps = [
   {
     number: '01',
     title: 'Strategy',
-    summary: 'We identify what your audience actually responds to, not just what looks good. Every project starts with research into your brand, your positioning, your content, your competitors and their paid media, and the creative angles most likely to convert.',
-    items: [
-      { title: 'Competitor Analysis', icon: 'CompetitorAnalysisIcon.png', text: 'We analyze top competitors to identify what’s working, what’s missing, and where the opportunities are.' },
-      { title: 'Audience Research', icon: 'AudienceResearchIcon.png', text: 'We dig into your audience’s pain points, desires, and behaviors to inform the creative direction.' },
-      { title: 'Paid Ad Audit', icon: 'PaidAdAuditIcon.png', text: 'We review your existing ads to find what’s underperforming and what can be improved.' },
-      { title: 'Messaging Insights', icon: 'MessagingInsightsIcon.png', text: 'We identify the angles, hooks, and messaging themes most likely to convert.' },
-    ],
+    text: 'We learn about your business, audience, competitors, and goals to build a data-driven strategy around what will actually move the needle.',
   },
   {
     number: '02',
-    title: 'Production',
-    summary: 'We produce performance creative designed to drive measurable business results, owning every stage of the creative process from strategy and scripting to production.',
-    items: [
-      { title: 'Creative Direction', icon: 'CreativeDirectionIcon.png', text: 'We develop the core concept, visual approach, and message that will resonate with your audience.' },
-      { title: 'Script & Messaging', icon: 'ScriptIcon.png', text: 'We write hooks, scripts, and CTAs that stop the scroll and drive action.' },
-      { title: 'Production', icon: 'ProductionIcon.png', text: 'We handle filming, talent, props, and everything needed to bring the concept to life.' },
-      { title: 'Editing & Finishing', icon: 'EditingIcon.png', text: 'We edit, add captions, sound design, and final polish to create thumb-stopping ads.' },
-    ],
+    title: 'Create',
+    text: 'We develop the content, creative, and campaigns designed to get your business in front of the right people.',
   },
   {
     number: '03',
-    title: 'Optimization',
-    summary: 'Winning ads aren’t built once, they’re refined over time. We keep your creative pipeline full of fresh concepts so your team can continuously test, learn, and improve performance.',
-    items: [
-      { title: 'Performance Analysis', icon: 'PerformanceIcon.png', text: 'We break down the data to find what’s working, what’s not, and why.' },
-      { title: 'Creative Testing', icon: 'CreativeTestingIcon.png', text: 'We continuously test new hooks, angles, and formats to uncover winning ads.' },
-      { title: 'Iteration', icon: 'IterationIcon.png', text: 'We refine, iterate, and evolve top performers to push results even further.' },
-      { title: 'Scaling Winners', icon: 'ScalingIcon.png', text: 'We double down on what works, scaling the creative that drives the best business outcomes.' },
-    ],
+    title: 'Launch & Optimize',
+    text: 'We launch your campaigns, monitor performance, and continuously optimize to improve results and drive more growth over time.',
   },
 ]
 
-const stats = [
-  { value: '60%', icon: '60_Icon.png', text: 'of US adults are less likely to buy products or services from companies that show the same ad repeatedly' },
-  { value: '88%', icon: '88_Icon.png', text: 'say overly repetitive ads make them pay less attention' },
-  { value: '76%', icon: '76_Icon.png', text: 'say overly repetitive ads makes them less favorable toward the brand.' },
-]
-
-const faqs = [
-  { title: 'What kind of companies do you work with?', paragraphs: ['We work with growing SaaS companies that rely on paid social advertising to acquire customers. Our best-fit clients are typically scaling their ad spend but don’t have the time or resources to build a dedicated in-house performance creative team.'] },
-  { title: 'Do you provide the creators?', paragraphs: ['Yes.', 'We source creators who match your target audience and manage the production process from start to finish. Whether your ads call for founders, customers, professionals, or lifestyle creators, we handle the recruiting, coordination, and creative direction.'] },
-  { title: 'What platforms do you create for?', paragraphs: ['We create paid social creative for:'], list: ['Meta (Facebook & Instagram)', 'TikTok', 'YouTube Shorts', 'LinkedIn'], after: 'Every creative is tailored to the platform it’s intended to run on.' },
-  { title: 'How is this different from hiring freelancers?', paragraphs: ['Hiring individual freelancers means managing strategy, scripting, creator sourcing, revisions, and production yourself.', 'We provide a complete creative system. Instead of coordinating multiple people, you work with one team that owns the entire process and continuously delivers fresh creative for testing.'] },
-  { title: 'How do you measure success?', paragraphs: ['Our goal isn’t simply to produce videos—it’s to create creative that improves business results. We work alongside your marketing team to build a repeatable testing process, helping you continuously introduce new concepts, combat creative fatigue, and improve paid advertising performance over time.'] },
-  { title: 'How quickly can we get started?', paragraphs: ['Most projects begin within one to two weeks after onboarding.', 'Once strategy is complete, we begin sourcing creators, developing concepts, and producing your first batch of creatives.'] },
+const benefits = [
+  {
+    icon: 'target',
+    title: 'Strategy meets execution',
+    text: 'Your strategy, content, and advertising aren’t created in separate silos. We make them work together to drive results.',
+  },
+  {
+    icon: 'users',
+    title: 'Built around your business',
+    text: 'We don’t believe in cookie-cutter campaigns. Your messaging, creative, and strategy are built around your business and customers.',
+  },
+  {
+    icon: 'puzzle',
+    title: 'One team, end to end',
+    text: 'Instead of coordinating multiple freelancers or agencies, you have one team handling the strategy, creative, content, and advertising.',
+  },
+  {
+    icon: 'trend',
+    title: 'Focused on what matters',
+    text: 'We focus on the metrics that actually move your business forward—leads, customers, and growth.',
+  },
 ]
 
 const legalContent = computed(() => currentPage.value === 'terms' ? {
@@ -86,204 +110,301 @@ const legalContent = computed(() => currentPage.value === 'terms' ? {
   ],
 })
 
-function selectStage(index) {
-  if (index === activeStage.value) return
-  slideDirection.value = index > activeStage.value ? 'forward' : 'backward'
-  activeStage.value = index
+function closeMobileMenu() {
+  mobileMenuOpen.value = false
 }
 
-function isNavActive(href) {
-  return (href === '#home' && currentPage.value === 'home') || href === `#/${currentPage.value}`
+function isNavActive(item) {
+  return currentPage.value === 'home' && activeSection.value === item.section
 }
 
-function handleStageKeydown(event, index) {
-  let next = index
-  if (event.key === 'ArrowRight' || event.key === 'ArrowDown') next = (index + 1) % processStages.length
-  else if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') next = (index - 1 + processStages.length) % processStages.length
-  else if (event.key === 'Home') next = 0
-  else if (event.key === 'End') next = processStages.length - 1
-  else return
-  event.preventDefault()
-  selectStage(next)
-  nextTick(() => document.getElementById(`process-tab-${next}`)?.focus())
+function handleContactClick(event) {
+  closeMobileMenu()
+  if (!contactEnabled.value) event.preventDefault()
+}
+
+function scrollToTarget(selector) {
+  window.setTimeout(() => {
+    document.querySelector(selector)?.scrollIntoView()
+  }, 0)
+}
+
+function updateActiveSection() {
+  if (currentPage.value !== 'home') return
+  const about = document.getElementById('about')
+  if (!about) return
+  activeSection.value = window.scrollY >= about.offsetTop - window.innerHeight * 0.36 ? 'about' : 'home'
 }
 
 async function syncRoute() {
   const hash = window.location.hash
-  currentPage.value = hash === '#/terms' ? 'terms' : hash === '#/privacy' ? 'privacy' : hash === '#/about' ? 'about' : hash === '#/faq' ? 'faq' : 'home'
-  mobileMenuOpen.value = false
+  currentPage.value = hash === '#/terms' ? 'terms' : hash === '#/privacy' ? 'privacy' : 'home'
+  closeMobileMenu()
   await nextTick()
-  if (currentPage.value !== 'home') window.scrollTo({ top: 0 })
-  else if (hash && !hash.startsWith('#/')) setTimeout(() => document.querySelector(hash)?.scrollIntoView(), 0)
+
+  if (currentPage.value !== 'home') {
+    window.scrollTo({ top: 0 })
+    return
+  }
+
+  if (hash === '#/about') {
+    window.history.replaceState(null, '', '#about')
+    scrollToTarget('#about')
+  } else if (hash === '#/faq' || hash.startsWith('#/')) {
+    window.history.replaceState(null, '', '#home')
+    window.scrollTo({ top: 0 })
+  } else if (hash === '#about' || hash === '#home') {
+    scrollToTarget(hash)
+  }
+
+  window.setTimeout(updateActiveSection, 0)
 }
 
 onMounted(() => {
   syncRoute()
   window.addEventListener('hashchange', syncRoute)
+  window.addEventListener('scroll', updateActiveSection, { passive: true })
 })
-onUnmounted(() => window.removeEventListener('hashchange', syncRoute))
+
+onUnmounted(() => {
+  window.removeEventListener('hashchange', syncRoute)
+  window.removeEventListener('scroll', updateActiveSection)
+})
 </script>
 
 <template>
   <div class="site-shell">
     <header class="site-header">
       <div class="container header-inner">
-        <a href="#home" class="brand" aria-label="Hyacinth Advertising home">
-          <span>Hyacinth Advertising</span>
+        <a href="#home" class="brand" aria-label="Hyacinth Advertising home" @click="closeMobileMenu">
+          Hyacinth Advertising
         </a>
+
         <nav class="desktop-nav" aria-label="Primary navigation">
-          <a v-for="item in navItems" :key="item.href" :href="item.href" :class="{ active: isNavActive(item.href) }" :aria-current="isNavActive(item.href) ? 'page' : undefined">{{ item.label }}</a>
+          <a
+            v-for="item in navItems"
+            :key="item.href"
+            :href="item.href"
+            :class="{ active: isNavActive(item) }"
+            :aria-current="isNavActive(item) ? 'location' : undefined"
+          >
+            {{ item.label }}
+          </a>
         </nav>
-        <a href="#book-call" class="button header-cta">Book a Call</a>
-        <button class="menu-button" type="button" :aria-expanded="mobileMenuOpen" aria-controls="mobile-menu" aria-label="Toggle navigation" @click="mobileMenuOpen = !mobileMenuOpen">
+
+        <a
+          :href="contactEnabled ? googleFormUrl : '#'"
+          class="contact-button contact-button--header"
+          :class="{ 'is-disabled': !contactEnabled }"
+          :target="contactEnabled ? '_blank' : undefined"
+          :rel="contactEnabled ? 'noopener noreferrer' : undefined"
+          :aria-disabled="contactEnabled ? undefined : 'true'"
+          :title="contactEnabled ? 'Open our Google contact form' : 'Contact form coming soon'"
+          @click="handleContactClick"
+        >
+          Get in touch
+        </a>
+
+        <button
+          class="menu-button"
+          type="button"
+          :aria-expanded="mobileMenuOpen"
+          aria-controls="mobile-menu"
+          aria-label="Toggle navigation"
+          @click="mobileMenuOpen = !mobileMenuOpen"
+        >
           <span></span><span></span><span></span>
         </button>
       </div>
+
       <nav v-show="mobileMenuOpen" id="mobile-menu" class="mobile-nav" aria-label="Mobile navigation">
-        <a v-for="item in navItems" :key="item.href" :href="item.href" :aria-current="isNavActive(item.href) ? 'page' : undefined" @click="mobileMenuOpen = false">{{ item.label }}</a>
-        <a href="#book-call" @click="mobileMenuOpen = false">Book a Call</a>
+        <a
+          v-for="item in navItems"
+          :key="item.href"
+          :href="item.href"
+          :aria-current="isNavActive(item) ? 'location' : undefined"
+          @click="closeMobileMenu"
+        >
+          {{ item.label }}
+        </a>
+        <a
+          :href="contactEnabled ? googleFormUrl : '#'"
+          :target="contactEnabled ? '_blank' : undefined"
+          :rel="contactEnabled ? 'noopener noreferrer' : undefined"
+          :aria-disabled="contactEnabled ? undefined : 'true'"
+          :title="contactEnabled ? 'Open our Google contact form' : 'Contact form coming soon'"
+          :class="{ 'is-disabled': !contactEnabled }"
+          @click="handleContactClick"
+        >
+          Get in touch
+        </a>
       </nav>
     </header>
 
     <main v-if="currentPage === 'home'">
-      <section id="home" class="container hero">
-        <div class="hero-copy">
-          <h1>We create ads<br />that convert.</h1>
-          <p>We help AI &amp; SaaS companies scale paid advertising by becoming their external performance creative team.</p>
-          <a href="#book-call" class="button">Book a Call <span aria-hidden="true">→</span></a>
+      <section id="home" class="hero-section">
+        <div class="container hero-content">
+          <h1>We help businesses grow<br class="desktop-break" /> through digital marketing.</h1>
+          <p>
+            We provide strategy, content creation, social media services,<br class="desktop-break" />
+            and paid advertising across Facebook, Instagram, Google, and TikTok.
+          </p>
+          <a
+            :href="contactEnabled ? googleFormUrl : '#'"
+            class="contact-button contact-button--hero"
+            :class="{ 'is-disabled': !contactEnabled }"
+            :target="contactEnabled ? '_blank' : undefined"
+            :rel="contactEnabled ? 'noopener noreferrer' : undefined"
+            :aria-disabled="contactEnabled ? undefined : 'true'"
+            :title="contactEnabled ? 'Open our Google contact form' : 'Contact form coming soon'"
+            @click="handleContactClick"
+          >
+            <span>Get in touch</span><span aria-hidden="true">→</span>
+          </a>
         </div>
-        <div class="hero-image"><img :src="`${baseUrl}hero-team.png`" alt="The Hyacinth Advertising founders" /></div>
       </section>
 
-      <section id="process" class="process-section">
-        <div class="container process-intro">
-          <div>
-            <h2>Our Process</h2>
-            <p>Every month we introduce fresh hooks, messaging angles, creators, and concepts so your team can continuously fight creative fatigue.</p>
-          </div>
-          <div class="stage-tabs" role="tablist" aria-label="Our process stages">
-            <button v-for="(stage, index) in processStages" :id="`process-tab-${index}`" :key="stage.title" class="stage-tab" :class="{ active: activeStage === index }" type="button" role="tab" :aria-selected="activeStage === index" :aria-controls="`process-panel-${index}`" :tabindex="activeStage === index ? 0 : -1" @click="selectStage(index)" @keydown="handleStageKeydown($event, index)">
-              <span class="flower-window"><span class="flower-strip" :style="{ backgroundImage: `url(${baseUrl}hyacinth-stages.png)`, backgroundPosition: `${flowerPositions[index]}% top` }"></span></span>
-              <span class="stage-number">{{ stage.number }}</span>
-              <span class="stage-dot" aria-hidden="true"></span>
-              <span class="stage-name">{{ stage.title }}</span>
-            </button>
-          </div>
-        </div>
+      <section id="services" class="services-section">
+        <div class="container">
+          <div class="services-heading-row">
+            <div class="section-intro">
+              <h2>Our Services</h2>
+              <p>We provide strategy, content creation, social media services, and paid advertising across Facebook, Instagram, Google, and TikTok.</p>
+            </div>
 
-        <div class="container process-card-wrap">
-          <Transition :name="slideDirection === 'forward' ? 'slide-forward' : 'slide-backward'" mode="out-in">
-            <article :id="`process-panel-${activeStage}`" :key="activeStage" class="process-card" :class="{ 'strategy-stage': activeStage === 0 }" role="tabpanel" :aria-labelledby="`process-tab-${activeStage}`">
-              <div class="stage-summary">
-                <span>{{ processStages[activeStage].number }}</span>
-                <h3>{{ processStages[activeStage].title }}</h3>
-                <p>{{ processStages[activeStage].summary }}</p>
-              </div>
-              <div class="process-items">
-                <div v-for="item in processStages[activeStage].items" :key="item.title" class="process-item">
-                  <img :src="`${baseUrl}Icons/${item.icon}`" alt="" />
-                  <h4>{{ item.title }}</h4>
-                  <p>{{ item.text }}</p>
+            <div class="platforms" aria-label="Platforms we work with">
+              <p class="platforms-label">Platforms we work with</p>
+              <div class="platform-list">
+                <div v-for="platform in platforms" :key="platform.name" class="platform-item">
+                  <SiteIcon :name="platform.icon" />
+                  <span>{{ platform.name }}</span>
                 </div>
               </div>
+            </div>
+          </div>
+
+          <div class="services-grid">
+            <article v-for="service in services" :key="service.title" class="service-card">
+              <SiteIcon :name="service.icon" class="service-icon" />
+              <h3>{{ service.title }}</h3>
+              <span class="accent-rule" aria-hidden="true"></span>
+              <p>{{ service.text }}</p>
             </article>
-          </Transition>
-          <p class="process-hint"><img :src="`${baseUrl}Icons/InfoIcon.png`" alt="" /> Click any stage above to explore our process</p>
+          </div>
+
+          <aside class="wide-callout partner-callout">
+            <div class="callout-icon"><SiteIcon name="users" /></div>
+            <div class="callout-copy">
+              <h3>A Full-Service Partner</h3>
+              <p>From strategy to execution, we handle everything so you can focus on running your business.</p>
+              <p>Our goal is simple: deliver more qualified leads and more customers.</p>
+            </div>
+          </aside>
         </div>
       </section>
 
-      <section class="stats-section">
+      <section class="works-section">
         <div class="container">
-          <h2>Winning paid advertising is<br />about consistently testing new creative.</h2>
-          <div class="stats-card">
-            <article v-for="stat in stats" :key="stat.value">
-              <span class="icon-tile"><img :src="`${baseUrl}Icons/${stat.icon}`" alt="" /></span>
-              <strong>{{ stat.value }}</strong>
-              <p>{{ stat.text }}</p>
+          <div class="works-heading section-intro">
+            <p class="eyebrow">How it works</p>
+            <h2>How It Works</h2>
+            <p>Our process is simple and collaborative. <br />We handle the strategy, content, and advertising <br />so you can focus on running your business.</p>
+          </div>
+
+          <div class="process-flow">
+            <article v-for="(step, index) in processSteps" :key="step.number" class="process-step">
+              <div
+                class="process-flower"
+                :class="`process-flower--${index + 1}`"
+                :style="{ backgroundImage: `url(${baseUrl}hyacinth-stages.png)` }"
+                aria-hidden="true"
+              ></div>
+              <div class="process-copy">
+                <span class="step-number">{{ step.number }}</span>
+                <h3>{{ step.title }}</h3>
+                <span class="accent-rule" aria-hidden="true"></span>
+                <p>{{ step.text }}</p>
+              </div>
+              <span v-if="index < processSteps.length - 1" class="process-arrow" aria-hidden="true">→</span>
             </article>
           </div>
-          <p class="source"><img :src="`${baseUrl}Icons/InfoIcon.png`" alt="" /> <strong>Source:</strong> EMARKETER, citing Clutch Consumer Advertising Survey (2025)</p>
+
+          <aside class="wide-callout partnership-callout">
+            <div class="callout-icon"><SiteIcon name="users" /></div>
+            <div class="callout-copy">
+              <h3>A true partnership.</h3>
+              <p>We keep you in the loop every step of the way with clear communication,<br class="desktop-break" /> transparent reporting, and a focus on the results that matter most.</p>
+            </div>
+          </aside>
         </div>
       </section>
 
-      <section id="book-call" class="booking-section">
-        <div class="container booking-grid">
-          <div class="booking-copy">
-            <h2>Book a call</h2>
-            <p>Let’s talk about your goals and how we can help you scale with better creative.</p>
-            <ul>
-              <li><img :src="`${baseUrl}Icons/BookACallIcon1.png`" alt="" /><span><strong>30 minute call</strong>Online via Google Meet</span></li>
-              <li><img :src="`${baseUrl}Icons/BookACallIcon2.png`" alt="" /><span><strong>Quick &amp; easy</strong>Pick a time that works for you</span></li>
-              <li><img :src="`${baseUrl}Icons/BookACallIcon3.png`" alt="" /><span><strong>No commitment</strong>Just a conversation</span></li>
-            </ul>
+      <section id="about" class="why-section">
+        <div class="container">
+          <div class="why-grid">
+            <div class="why-intro section-intro">
+              <p class="eyebrow">Why Hyacinth</p>
+              <h2>Why work<br />with us?</h2>
+              <span class="accent-rule" aria-hidden="true"></span>
+              <p>We’re more than just another marketing agency. We become a growth partner invested in your success.</p>
+            </div>
+
+            <div class="benefit-list">
+              <article v-for="benefit in benefits" :key="benefit.title" class="benefit-item">
+                <div class="benefit-icon"><SiteIcon :name="benefit.icon" /></div>
+                <div>
+                  <h3>{{ benefit.title }}</h3>
+                  <p>{{ benefit.text }}</p>
+                </div>
+              </article>
+            </div>
           </div>
-          <form class="booking-form" @submit.prevent="formSubmitted = true">
-            <div class="form-row">
-              <label>First Name<input required name="firstName" autocomplete="given-name" /></label>
-              <label>Last Name<input required name="lastName" autocomplete="family-name" /></label>
-            </div>
-            <label>Business Name<input required name="businessName" autocomplete="organization" /></label>
-            <label>Email Address<input required type="email" name="email" autocomplete="email" /></label>
-            <label>Additional Info (Optional)<textarea name="additionalInfo" rows="5"></textarea></label>
-            <button class="button" type="submit">Book a Call <span aria-hidden="true">→</span></button>
-            <p v-if="formSubmitted" class="form-success" role="status">Thanks! We’ll be in touch.</p>
-            <p class="secure-note"><img :src="`${baseUrl}Icons/SecureIcon.png`" alt="" /> Your information is secure and will never be shared.</p>
-          </form>
-        </div>
-      </section>
-    </main>
 
-    <main v-else-if="currentPage === 'about'" class="inner-page container">
-      <section class="about-page-grid">
-        <div class="inner-page-title">
-          <span>About Us</span>
-          <h1>About<br />Hyacinth</h1>
-        </div>
-        <div class="about-page-copy">
-          <p>After years of creating commercial-quality video content, we noticed something: the ads that consistently perform best don’t look like ads at all. They feel authentic, relatable, and built for the platforms people actually use every day.</p>
-          <p><strong>That’s why we started Hyacinth.</strong></p>
-          <p>We partner with brands to produce high-performing paid ad creative by managing every step of the creative process, from strategy and scripting to creator sourcing, filming, editing, and delivery. Instead of chasing one-off viral videos, we help brands build a consistent pipeline of fresh creative they can confidently use across TikTok, Instagram, Facebook, and beyond.</p>
-          <p>Our goal is simple: create content that earns attention, builds trust, and drives results.</p>
-        </div>
-      </section>
-    </main>
-
-    <main v-else-if="currentPage === 'faq'" class="inner-page faq-page container">
-      <section class="faq-page-grid">
-        <div class="inner-page-title">
-          <span>FAQs</span>
-          <h1>Frequently<br />Asked Questions</h1>
-        </div>
-        <ol class="faq-list">
-          <li v-for="(faq, index) in faqs" :key="faq.title">
-            <span class="faq-number">{{ String(index + 1).padStart(2, '0') }}</span>
+          <aside class="growth-callout">
+            <div class="growth-icon"><SiteIcon name="hyacinth" /></div>
             <div>
-              <h2>{{ faq.title }}</h2>
-              <p v-for="paragraph in faq.paragraphs" :key="paragraph">{{ paragraph }}</p>
-              <ul v-if="faq.list"><li v-for="item in faq.list" :key="item">{{ item }}</li></ul>
-              <p v-if="faq.after">{{ faq.after }}</p>
+              <h3>Our goal is your growth.</h3>
+              <p>We’re here to simplify digital marketing and deliver the<br class="desktop-break" /> results that make a real impact on your business.</p>
             </div>
-          </li>
-        </ol>
+          </aside>
+        </div>
+      </section>
+
+      <section class="contact-section">
+        <div class="container contact-content">
+          <h2>Let’s talk</h2>
+          <p>Tell us a little about your business and we’ll be in touch<br class="desktop-break" /> to set up a time that works for you.</p>
+          <a
+            :href="contactEnabled ? googleFormUrl : '#'"
+            class="contact-button contact-button--final"
+            :class="{ 'is-disabled': !contactEnabled }"
+            :target="contactEnabled ? '_blank' : undefined"
+            :rel="contactEnabled ? 'noopener noreferrer' : undefined"
+            :aria-disabled="contactEnabled ? undefined : 'true'"
+            :title="contactEnabled ? 'Open our Google contact form' : 'Contact form coming soon'"
+            @click="handleContactClick"
+          >
+            <span>Get in touch</span><span aria-hidden="true">→</span>
+          </a>
+          <p class="secure-note"><SiteIcon name="lock" /> Your information is secure and will never be shared.</p>
+          <nav class="legal-links" aria-label="Legal">
+            <a href="#/privacy">Privacy Policy</a>
+            <span aria-hidden="true">•</span>
+            <a href="#/terms">Terms of Service</a>
+          </nav>
+        </div>
       </section>
     </main>
 
     <main v-else class="legal-page container">
       <a href="#home" class="back-link">← Back to Home</a>
+      <p class="eyebrow">Hyacinth Advertising</p>
       <h1>{{ legalContent.title }}</h1>
       <p class="legal-date">Last updated: June 26, 2026</p>
       <section v-for="section in legalContent.sections" :key="section[0]">
-        <h2>{{ section[0] }}</h2><p>{{ section[1] }}</p>
+        <h2>{{ section[0] }}</h2>
+        <p>{{ section[1] }}</p>
       </section>
     </main>
-
-    <footer class="site-footer">
-      <div class="container footer-inner">
-        <h2>Hyacinth Advertising LLC</h2>
-        <a href="mailto:hello@hyacinthadvertising.com"><img :src="`${baseUrl}Icons/EmailIcon.png`" alt="" /> hello@hyacinthadvertising.com</a>
-        <p>© 2026 Hyacinth Advertising LLC</p>
-        <nav aria-label="Legal"><a href="#/privacy">Privacy Policy</a><span>•</span><a href="#/terms">Terms of Service</a></nav>
-      </div>
-    </footer>
   </div>
 </template>
