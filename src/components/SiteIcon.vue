@@ -10,7 +10,8 @@ defineProps({
 <template>
   <svg
     class="site-icon"
-    viewBox="0 0 24 24"
+    :class="`site-icon--${name}`"
+    :viewBox="name === 'hyacinth' ? '0 0 72 152' : name === 'puzzle' ? '-1.5 -1.5 27 27' : '0 0 24 24'"
     fill="none"
     stroke="currentColor"
     stroke-width="1.7"
@@ -20,9 +21,11 @@ defineProps({
     focusable="false"
   >
     <template v-if="name === 'target'">
-      <circle cx="11" cy="13" r="7.5" />
-      <circle cx="11" cy="13" r="3.5" />
-      <path d="m13.5 10.5 6.75-6.75M16.5 3.75h3.75V7.5" />
+      <path d="M10 5.5A8.5 8.5 0 1 0 18.5 14" />
+      <path d="M10 9.5A4.5 4.5 0 1 0 14.5 14" />
+      <circle cx="10" cy="14" r="1.55" />
+      <path d="m10 14 7.4-7.4" />
+      <path d="m17.4 6.6-.55-3.2L19 1.25l.65 2.2 2.2.65-2.15 2.15-3.3-.65Z" />
     </template>
 
     <template v-else-if="name === 'video'">
@@ -36,7 +39,7 @@ defineProps({
     </template>
 
     <template v-else-if="name === 'trend'">
-      <path d="M3.5 18.5 9 13l3.5 3.5L20.5 8" />
+      <path d="M3.5 18.5 9 13l3.5 3.5 7-9" />
       <path d="M15.5 7.5h4v4" />
     </template>
 
@@ -87,9 +90,24 @@ defineProps({
     </template>
 
     <template v-else-if="name === 'hyacinth'">
-      <path d="M12 21V8.5M12 16.5c-3.6 0-5.5-1.6-6.25-4.3 3.4-.2 5.2 1.2 6.25 3.4M12 18.4c2.95 0 4.8-1.25 5.75-3.65-2.9-.25-4.85.85-5.75 2.8" />
-      <path d="M12 3.25c1.5 0 2.5.85 2.5 2.05S13.5 7.4 12 8c-1.5-.6-2.5-1.5-2.5-2.7S10.5 3.25 12 3.25Z" />
-      <path d="M8.75 5.5c-1.3-.55-2.55-.2-2.95.8-.4 1 .25 2.05 1.55 2.8 1.4-.1 2.45-.6 2.85-1.6.4-1-.15-1.55-1.45-2ZM15.25 5.5c1.3-.55 2.55-.2 2.95.8.4 1-.25 2.05-1.55 2.8-1.4-.1-2.45-.6-2.85-1.6-.4-1 .15-1.55 1.45-2ZM9 9c-1.2-.1-2.2.45-2.35 1.35-.15.9.55 1.75 1.8 2.2 1.2-.35 1.95-1.05 2.1-1.9C10.7 9.8 10.2 9.1 9 9ZM15 9c1.2-.1 2.2.45 2.35 1.35.15.9-.55 1.75-1.8 2.2-1.2-.35-1.95-1.05-2.1-1.9C13.3 9.8 13.8 9.1 15 9Z" />
+      <g stroke-width="3.4">
+        <path d="M36 76v75M36 151C16 143 2 116 2 83c20 10 32 42 34 68ZM36 151c20-8 34-35 34-68-20 10-32 42-34 68Z" />
+        <ellipse cx="36" cy="8" rx="6.5" ry="7.5" />
+        <ellipse cx="27.5" cy="18.5" rx="7" ry="8" />
+        <ellipse cx="44.5" cy="18.5" rx="7" ry="8" />
+        <ellipse cx="20" cy="31" rx="7.5" ry="8.5" />
+        <ellipse cx="34.5" cy="31" rx="7" ry="8.5" />
+        <ellipse cx="50.5" cy="31" rx="7.5" ry="8.5" />
+        <ellipse cx="18.5" cy="43.5" rx="7.5" ry="8.5" />
+        <ellipse cx="31" cy="43.5" rx="6.5" ry="8.5" />
+        <ellipse cx="43.5" cy="43.5" rx="6.5" ry="8.5" />
+        <ellipse cx="54" cy="43.5" rx="7.5" ry="8.5" />
+        <ellipse cx="20" cy="56" rx="8" ry="8.5" />
+        <ellipse cx="35" cy="56" rx="7" ry="8.5" />
+        <ellipse cx="51" cy="56" rx="8" ry="8.5" />
+        <ellipse cx="27" cy="69" rx="7.5" ry="8.5" />
+        <ellipse cx="45" cy="69" rx="7.5" ry="8.5" />
+      </g>
     </template>
 
     <template v-else-if="name === 'lock'">
