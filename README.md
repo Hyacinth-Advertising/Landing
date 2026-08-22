@@ -32,7 +32,7 @@ Open the local URL printed in the terminal, usually `http://localhost:5173`. Cha
 | `src/siteConfig.js` | Shared Google Forms contact URL |
 | `public/` | Fonts and image assets |
 
-To activate the contact buttons, paste a valid Google Forms URL into `googleFormUrl` in `src/siteConfig.js`. Until then, the buttons remain disabled and show a “Contact form coming soon” message.
+The contact buttons use `googleFormUrl` in `src/siteConfig.js`. Replace it with another public Google Forms `viewform` URL if the form changes. Leaving the value empty disables the buttons and shows a “Contact form coming soon” message.
 
 ## Test a production build
 

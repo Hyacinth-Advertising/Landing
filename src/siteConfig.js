@@ -1,6 +1,5 @@
-// PASTE_GOOGLE_FORM_URL_HERE
-// Example: https://docs.google.com/forms/d/e/YOUR_FORM_ID/viewform
-export const googleFormUrl = ''
+// Public Google Forms responder URL used by every "Get in touch" button.
+export const googleFormUrl = 'https://docs.google.com/forms/d/e/1FAIpQLSf-e-HyCV4FyFvNbOP-XRkIzZuqF9uUb8iaJiornVT5rPJyFA/viewform'
 
 export function isGoogleFormUrl(value) {
   if (!value) return false
