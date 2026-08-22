@@ -150,7 +150,8 @@ h3,
   content: "";
   opacity: 0;
   transform: scaleX(0.4);
-  transition: opacity 180ms ease, transform 180ms ease;
+  transform-origin: center;
+  transition: opacity 180ms ease, transform 220ms ease;
 }
 
 .desktop-nav a:hover,
@@ -158,12 +159,17 @@ h3,
   color: var(--text);
 }
 
+.desktop-nav a:hover::after,
+.desktop-nav a:focus-visible::after,
 .desktop-nav a.active::after {
   opacity: 1;
   transform: scaleX(1);
 }
 
 .contact-button {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
   display: inline-flex;
   min-height: 56px;
   align-items: center;
@@ -171,18 +177,56 @@ h3,
   gap: 32px;
   border: 0;
   border-radius: 5px;
-  background: linear-gradient(105deg, var(--accent-deep), var(--accent-light));
+  background: linear-gradient(105deg, var(--accent-deep), var(--accent-light), var(--accent-deep));
+  background-position: 0 50%;
+  background-size: 200% 100%;
   box-shadow: 0 8px 18px rgb(87 59 185 / 10%);
   color: white;
   font-size: 15px;
   font-weight: 700;
-  transition: box-shadow 180ms ease, filter 180ms ease, transform 180ms ease;
+  transition:
+    background-position 360ms ease,
+    box-shadow 220ms ease,
+    filter 220ms ease,
+    transform 220ms ease;
 }
 
-.contact-button:not(.is-disabled):hover {
-  box-shadow: 0 11px 24px rgb(87 59 185 / 20%);
+.contact-button::before {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: linear-gradient(115deg, transparent 25%, rgb(255 255 255 / 24%) 48%, transparent 70%);
+  content: "";
+  pointer-events: none;
+  transform: translateX(-125%);
+  transition: transform 480ms ease;
+}
+
+.contact-button > span {
+  position: relative;
+  z-index: 1;
+}
+
+.contact-button:hover,
+.contact-button:focus-visible {
+  background-position: 100% 50%;
+  box-shadow: 0 12px 28px rgb(87 59 185 / 24%);
   filter: saturate(1.08) brightness(1.03);
+}
+
+.contact-button:hover::before,
+.contact-button:focus-visible::before {
+  transform: translateX(125%);
+}
+
+.contact-button:not(.is-disabled):hover,
+.contact-button:not(.is-disabled):focus-visible {
   transform: translateY(-2px);
+}
+
+.contact-button:not(.is-disabled):active {
+  box-shadow: 0 6px 15px rgb(87 59 185 / 16%);
+  transform: translateY(0) scale(0.985);
 }
 
 .contact-button.is-disabled {
@@ -249,6 +293,14 @@ h3,
 .contact-button--final > span:last-child {
   font-size: 1.25em;
   line-height: 0.8;
+  transition: transform 220ms ease;
+}
+
+.contact-button--hero:hover > span:last-child,
+.contact-button--hero:focus-visible > span:last-child,
+.contact-button--final:hover > span:last-child,
+.contact-button--final:focus-visible > span:last-child {
+  transform: translateX(6px);
 }
 
 .services-section {
@@ -906,12 +958,35 @@ h3,
     background: transparent;
     color: var(--text);
     cursor: pointer;
+    transition: background-color 180ms ease, border-color 180ms ease, color 180ms ease;
   }
 
   .menu-button span {
     width: 20px;
     height: 2px;
     background: currentColor;
+    transform-origin: center;
+    transition: opacity 180ms ease, transform 220ms ease;
+  }
+
+  .menu-button:hover,
+  .menu-button:focus-visible,
+  .menu-button[aria-expanded="true"] {
+    border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
+    background: var(--lavender);
+    color: var(--accent-deep);
+  }
+
+  .menu-button[aria-expanded="true"] span:first-child {
+    transform: translateY(7px) rotate(45deg);
+  }
+
+  .menu-button[aria-expanded="true"] span:nth-child(2) {
+    opacity: 0;
+  }
+
+  .menu-button[aria-expanded="true"] span:last-child {
+    transform: translateY(-7px) rotate(-45deg);
   }
 
   .mobile-nav {
@@ -927,6 +1002,14 @@ h3,
     color: #424347;
     font-size: 14px;
     font-weight: 650;
+    transition: background-color 180ms ease, color 180ms ease, padding-left 180ms ease;
+  }
+
+  .mobile-nav a:hover,
+  .mobile-nav a:focus-visible {
+    padding-left: 10px;
+    background: color-mix(in srgb, var(--lavender) 72%, transparent);
+    color: var(--accent-deep);
   }
 
   .mobile-nav a:last-child {

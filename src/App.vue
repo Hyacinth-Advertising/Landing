@@ -202,7 +202,7 @@ onUnmounted(() => {
           :title="contactEnabled ? 'Open our Google contact form' : 'Contact form coming soon'"
           @click="handleContactClick"
         >
-          Get in touch
+          <span>Get in touch</span>
         </a>
 
         <button
