@@ -41,7 +41,7 @@ npm run build
 npm run preview
 ```
 
-`npm run build` generates `dist/`. Do not edit that folder manually; this repository tracks it, so regenerate it before committing site changes.
+`npm run build` generates the ignored `dist/` folder. Do not edit or commit that folder; GitHub Actions creates a fresh production build during deployment.
 
 ## Routes and deployment
 

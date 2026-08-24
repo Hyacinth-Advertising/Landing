@@ -115,9 +115,6 @@ defineProps({
       <path d="M7.5 10V7.5a4.5 4.5 0 0 1 9 0V10M12 14.25v2.5" />
     </template>
 
-    <template v-else-if="name === 'arrow'">
-      <path d="M5 19 19 5M9 5h10v10" />
-    </template>
   </svg>
 </template>
 
